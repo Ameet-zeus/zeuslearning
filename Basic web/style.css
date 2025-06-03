@@ -1,0 +1,54 @@
+body{
+    background-color: #ffee98;
+}
+
+h1 {
+    background-color: rgb(166, 0, 0);
+    color: #ffee98;
+    text-align: center;
+    letter-spacing: 8px;
+    margin-bottom: 0;
+}
+
+#redbar {
+    margin-top: 0;
+    background-color: red;
+    height: 7px;
+}
+
+h3 {
+    background-color: green;
+    color: white;
+    padding-left: 2%;
+}
+
+li {
+    color: rgb(166, 0, 0);
+    font-style: italic;
+}
+
+img {
+    padding: 2%;
+    background-color: white;
+    border-style: dotted;
+    border-color: rgb(178, 178, 178);
+}
+
+#myTable {
+    background-color:  rgb(178, 178, 178);
+    border-width: 2px;
+}
+
+td {
+    border-width: 2px;
+}
+
+.sub-topic {
+    color: rgb(178, 178, 178);
+}
+
+#submit-btn {
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left: 10px;
+}
