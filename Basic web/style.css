@@ -1,0 +1,67 @@
+*{
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+a, u {
+  text-decoration: none;
+}
+
+body{
+    background-color: #fffbb5;
+}
+
+h1 {
+    background-color: rgb(166, 0, 0);
+    color: #fffbb5;
+    text-align: center;
+    letter-spacing: 10px;
+    margin-bottom: 0;
+    padding: 1%;
+}
+
+#redbar {
+    margin-top: 0;
+    background-color: red;
+    height: 7px;
+}
+
+h3 {
+    background-color: rgb(2, 149, 2);
+    color: white;
+    padding-left: 2%;
+}
+
+li {
+    color: rgb(166, 0, 0);
+    font-style: italic;
+}
+
+img {
+    padding: 2%;
+    background-color: white;
+    border-style: dotted;
+    border-color: rgb(178, 178, 178);
+}
+
+#myTable {
+    background-color:  rgb(178, 178, 178);
+    border-width: 2px;
+}
+
+td {
+    border-width: 2px;
+}
+
+.sub-topic {
+    color: rgb(178, 178, 178);
+}
+
+#submit-btn {
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left: 10px;
+}
+
+#gender{
+    padding: 5px;
+}
