@@ -23,23 +23,23 @@
 
       <div class="nav-switcher">
 
-        <div class="nav-tab active" onclick="switchTab(this, 'dashboard')">
+        <div class="nav-tab big-scr active" onclick="switchTab(this, 'dashboard')">
           <span>DASHBOARD</span>
         </div>
 
-        <div class="nav-tab" onclick="switchTab(this, 'content')">
+        <div class="nav-tab big-scr" onclick="switchTab(this, 'content')">
           <span>CONTENT</span>
         </div>
 
-        <div class="nav-tab" onclick="switchTab(this, 'users')">
+        <div class="nav-tab big-scr" onclick="switchTab(this, 'users')">
           <span>USERS</span>
         </div>
 
-        <div class="nav-tab" onclick="switchTab(this, 'reports')">
+        <div class="nav-tab big-scr" onclick="switchTab(this, 'reports')">
           <span>REPORTS</span>
         </div>
 
-        <div class="nav-tab" onclick="switchTab(this, 'admin')">
+        <div class="nav-tab big-scr" onclick="switchTab(this, 'admin')">
           <span>ADMIN</span>
         </div>
 
@@ -55,7 +55,21 @@
           <img src="/assets/icons/favourite.svg" alt="Profile Picture" />
         </div>
 
+        <div class="nav-tab hamburg">
+          <img src="/assets/icons/hamburger-menu.svg" alt="Profile Picture" />
+        </div>
+
       </div>
+
+      <!-- Dropdown menu for small screens -->
+      <div id="mobile-menu" class="hamburger-menu" hidden>
+        <div class="hamburger-tab" onclick="switchTab(this, 'dashboard')">DASHBOARD</div>
+        <div class="hamburger-tab" onclick="switchTab(this, 'content')">CONTENT</div>
+        <div class="hamburger-tab" onclick="switchTab(this, 'users')">USERS</div>
+        <div class="hamburger-tab" onclick="switchTab(this, 'reports')">REPORTS</div>
+        <div class="hamburger-tab" onclick="switchTab(this, 'admin')">ADMIN</div>
+      </div>
+
 
     </div>
 

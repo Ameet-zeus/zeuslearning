@@ -2,6 +2,11 @@ export function createCourseCard(course) {
   const card = document.createElement('div');
   card.className = 'course-card';
 
+  const getIconHTML = (icon, title, active = true) => {
+    const opacity = active ? '1' : '0.4';
+    return `<img src="../assets/icons/${icon}.svg" alt="${title}" title="${title}" style="opacity: ${opacity}" class="${title === 'Calendar' || title === 'Clone' ? 'big-icon' : ''}">`;
+  };
+
   card.innerHTML = `
     <div class="card-header">
       <img src="${course.image}" alt="${course.title}" class="side-img">
@@ -19,10 +24,10 @@ export function createCourseCard(course) {
     </div>
 
     <div class="course-actions">
-      <img src="../assets/icons/preview.svg" alt="View" title="View">
-      <img src="../assets/icons/manage course.svg" alt="Calendar" title="Calendar" class="big-icon">
-      <img src="../assets/icons/grade submissions.svg" alt="Clone" title="Clone" class="big-icon">
-      <img src="../assets/icons/reports.svg" alt="Report" title="Report">
+      ${getIconHTML('preview', 'View', course.icons?.preview)}
+      ${getIconHTML('manage course', 'Calendar', course.icons?.calendar)}
+      ${getIconHTML('grade submissions', 'Clone', course.icons?.clone)}
+      ${getIconHTML('reports', 'Report', course.icons?.report)}
     </div>
   `;
 

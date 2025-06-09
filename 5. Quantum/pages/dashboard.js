@@ -16,6 +16,12 @@ const courseData = [
     image: "/assets/images/imageMask-1.svg",
     starred: true,
     expired: false,
+    icons: {
+      preview: true,
+      calendar: true,
+      clone: true,
+      report: true
+    }
   },
   {
     title: "Displacement, Velocity and Speed",
@@ -31,6 +37,12 @@ const courseData = [
     image: "/assets/images/imageMask-2.svg",
     starred: true,
     expired: false,
+    icons: {
+      preview: true,
+      calendar: false,
+      clone: false,
+      report: true
+    }
   },
   {
     title: "Introduction to Biology: Microorganisms...",
@@ -46,6 +58,12 @@ const courseData = [
     image: "/assets/images/imageMask.svg",
     starred: true,
     expired: false,
+    icons: {
+      preview: true,
+      calendar: false,
+      clone: false,
+      report: true
+    }
   },
   {
     title: "Introduction to High School Mathematics",
@@ -61,14 +79,41 @@ const courseData = [
     image: "/assets/images/imageMask-3.svg",
     starred: false,
     expired: true,
+    icons: {
+      preview: true,
+      calendar: true,
+      clone: true,
+      report: true
+    }
   },
 ];
+
 
 const container = document.getElementById("course-container");
 courseData.forEach((course) => container.appendChild(createCourseCard(course)));
 
 const container2 = document.getElementById("footer-container");
 container2.appendChild(renderFooter());
+
+
+
+
+
+const hamburger = document.querySelector('.hamburg');
+const mobileMenu = document.getElementById('mobile-menu');
+
+hamburger.addEventListener('click', () => {
+  mobileMenu.hidden = !mobileMenu.hidden;
+});
+
+document.addEventListener('click', (event) => {
+  const isClickInside = hamburger.contains(event.target) || mobileMenu.contains(event.target);
+  if (!isClickInside) {
+    mobileMenu.hidden = true;
+  }
+});
+
+
 
 function switchTab(clickedTab, type) {
   document
