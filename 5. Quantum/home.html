@@ -43,60 +43,91 @@
           <span>ADMIN</span>
         </div>
 
-        <div class="nav-tab" onclick="switchTab(this, 'alerts')">
+        <div class="nav-tab dropdown">
           <img src="/assets/icons/alerts.svg" alt="Alerts" />
+          <div class="dropdown-content">
+            <div class="dropdown-item">New Alert</div>
+          </div>
         </div>
 
-        <div class="nav-tab" onclick="switchTab(this, 'announcements')">
+
+        <div class="nav-tab dropdown">
           <img src="/assets/icons/announcements.svg" alt="Announcements" />
+          <div class="dropdown-content">
+            <div class="dropdown-item">New Announcement</div>
+          </div>
         </div>
 
-        <div class="nav-tab" onclick="switchTab(this, 'pfp')">
-          <img src="/assets/icons/favourite.svg" alt="Profile Picture" />
-        </div>
 
-        <div class="nav-tab hamburg">
-          <img src="/assets/icons/hamburger-menu.svg" alt="Profile Picture" />
-        </div>
-
+      <div class="nav-tab" onclick="switchTab(this, 'pfp')">
+        <img src="/assets/icons/account_circle.svg" alt="Profile Picture" />
       </div>
 
-      <!-- Dropdown menu for small screens -->
-      <div id="mobile-menu" class="hamburger-menu" hidden>
-        <div class="hamburger-tab" onclick="switchTab(this, 'dashboard')">DASHBOARD</div>
-        <div class="hamburger-tab" onclick="switchTab(this, 'content')">CONTENT</div>
-        <div class="hamburger-tab" onclick="switchTab(this, 'users')">USERS</div>
-        <div class="hamburger-tab" onclick="switchTab(this, 'reports')">REPORTS</div>
-        <div class="hamburger-tab" onclick="switchTab(this, 'admin')">ADMIN</div>
+      <div class="nav-tab hamburg">
+        <img src="/assets/icons/hamburger-menu.svg" alt="Profile Picture" />
       </div>
-
 
     </div>
 
-    <div class="main-container">
-      <div class="switcher">
-        <div class="tab active" onclick="switchTab2(this, 'courses')">
-          <img src="assets/icons/courses.svg" alt="Courses" />
-          <span><strong>4</strong> Courses</span>
-        </div>
-        <div class="tab" onclick="switchTab2(this, 'classes')">
-          <img src="assets/icons/classes.svg" alt="Classes" />
-          <span><strong>4</strong> Classes</span>
-        </div>
+    <div id="mobile-menu" class="hamburger-menu" hidden>
+      <div class="hamburger-tab" onclick="switchTab(this, 'dashboard')">
+        <span>DASHBOARD</span>
       </div>
-
-      <div class="filter">
-        <div class="course-count">Showing 4 of 4 courses</div>
-        <div class="sort">Sort By: <select name="" id="">
-            <option value="">Course Name</option>
-          </select></div>
-        <img src="/assets/icons/sort.svg" alt="">
+      <div class="hamburger-tab" onclick="toggleSubTabs('content')">
+        <span>CONTENT</span>
+        <img src="/assets/icons/down-arrow.svg" alt="" class="arrow">
       </div>
+      <div class="hamburger-tab sub-tab course-tab" onclick="switchTab(this, 'content1')">
+        <span>COURSE CATALOG</span>
+      </div>
+      <div class="hamburger-tab" onclick="toggleSubTabs('users')">
+        <span>USERS</span>
+        <img src="/assets/icons/down-arrow.svg" alt="" class="arrow">
+      </div>
+      <div class="hamburger-tab sub-tab user-tab" onclick="switchTab(this, 'users1')">
+        <span>USER 1</span>
+      </div>
+      <div class="hamburger-tab" onclick="toggleSubTabs('reports')">
+        <span>REPORTS</span>
+        <img src="/assets/icons/down-arrow.svg" alt="" class="arrow">
+      </div>
+      <div class="hamburger-tab sub-tab report-tab" onclick="switchTab(this, 'reports1')">
+        <span>REPORT 1</span>
+      </div>
+      <div class="hamburger-tab" onclick="toggleSubTabs('admin')">
+        <span>ADMIN</span>
+        <img src="/assets/icons/down-arrow.svg" alt="" class="arrow">
+      </div>
+      <div class="hamburger-tab sub-tab admin-tab" onclick="switchTab(this, 'admin1')">
+        <span>ADMIN 1</span>
+      </div>
+    </div>
+  </div>
 
-      <div id="course-container" class="courses-wrapper"></div>
+  <div class="main-container">
+    <div class="switcher">
+      <div class="tab active" onclick="switchTab2(this, 'courses')">
+        <img src="assets/icons/courses.svg" alt="Courses" />
+        <span><strong>4</strong> Courses</span>
+      </div>
+      <div class="tab" onclick="switchTab2(this, 'classes')">
+        <img src="assets/icons/classes.svg" alt="Classes" />
+        <span><strong>4</strong> Classes</span>
+      </div>
     </div>
 
-    <div id="footer-container"></div>
+    <div class="filter">
+      <div class="course-count">Showing 4 of 4 courses</div>
+      <div class="sort">Sort By: <select name="" id="">
+          <option value="">Course Name</option>
+        </select></div>
+      <img src="/assets/icons/sort.svg" alt="">
+    </div>
+
+    <div id="course-container" class="courses-wrapper"></div>
+  </div>
+
+  <div id="footer-container"></div>
   </div>
 </body>
 

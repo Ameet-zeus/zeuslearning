@@ -1,19 +1,24 @@
-.nav-bg {
-    background-image: url('/assets/header_pattern_svg.svg');
-    position: absolute;
-    z-index: -1;
-    width: 100%;
+.nav {
     height: 7vh;
-    background-size: cover;
-  }
-  
-  .nav {
-    height: 7vh;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.9);
+    position: relative;
     box-shadow: 0 2px 4px #3AC7EC;
     display: flex;
     align-items: center;
-  }
+    z-index: 1;
+}
+
+.nav-bg {
+  opacity: 0.6;
+    background-image: url('/assets/header_pattern_svg.svg');
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    height: 100%;
+    background-size: cover;
+}
+
   
   .logo-container {
     padding-left: 24px;

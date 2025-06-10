@@ -1,6 +1,7 @@
 import { createCourseCard } from "../component/courseCard.js";
 import { renderFooter } from "../component/footer.js";
 
+// COURSE DATA
 const courseData = [
   {
     title: "Acceleration",
@@ -88,17 +89,15 @@ const courseData = [
   },
 ];
 
-
+//RENDER COURSES
 const container = document.getElementById("course-container");
 courseData.forEach((course) => container.appendChild(createCourseCard(course)));
 
+//RENDER FOOTER
 const container2 = document.getElementById("footer-container");
 container2.appendChild(renderFooter());
 
-
-
-
-
+//HAMBURGER ICON
 const hamburger = document.querySelector('.hamburg');
 const mobileMenu = document.getElementById('mobile-menu');
 
@@ -113,8 +112,36 @@ document.addEventListener('click', (event) => {
   }
 });
 
+//NAV BAR HAMBUERGER SUBTABS
+function toggleSubTabs(tabName) {
+  document.querySelectorAll('.sub-tab').forEach(tab => {
+    tab.style.display = 'none';
+  });
 
+  let subTabClass = '';
+  switch (tabName) {
+    case 'content':
+      subTabClass = 'course-tab';
+      break;
+    case 'users':
+      subTabClass = 'user-tab';
+      break;
+    case 'reports':
+      subTabClass = 'report-tab';
+      break;
+    case 'admin':
+      subTabClass = 'admin-tab';
+      break;
+  }
 
+  if (subTabClass) {
+    document.querySelectorAll(`.${subTabClass}`).forEach(tab => {
+      tab.style.display = 'block';
+    });
+  }
+}
+
+//NAVBAR SWITCHTAB
 function switchTab(clickedTab, type) {
   document
     .querySelectorAll(".nav-tab")
@@ -122,6 +149,34 @@ function switchTab(clickedTab, type) {
   clickedTab.classList.add("active");
 }
 
+
+document.addEventListener('DOMContentLoaded', () => {
+  const dropdowns = document.querySelectorAll('.nav-tab.dropdown');
+
+  dropdowns.forEach(dropdown => {
+    const content = dropdown.querySelector('.dropdown-content');
+
+    dropdown.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Close all other dropdowns
+      document.querySelectorAll('.dropdown-content').forEach(dc => {
+        if (dc !== content) dc.style.display = 'none';
+      });
+      // Toggle current
+      content.style.display = content.style.display === 'block' ? 'none' : 'block';
+    });
+  });
+
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.dropdown-content').forEach(dc => {
+      dc.style.display = 'none';
+    });
+  });
+});
+
+
+
+//COURSE CLASSES SWITCH TAB
 function switchTab2(clickedTab, type) {
   document
     .querySelectorAll(".tab")
@@ -131,3 +186,4 @@ function switchTab2(clickedTab, type) {
 
 window.switchTab = switchTab;
 window.switchTab2 = switchTab2;
+window.toggleSubTabs = toggleSubTabs;
