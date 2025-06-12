@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `)
     .join('');
 
-  const alertsContainer = document.getElementById("alert-dropdown");
+  const alertsContainer = document.getElementById("alerts-data");
   if (alertsContainer) {
     alertsContainer.innerHTML = alertHTML;
   }
@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `)
     .join('');
 
-  const announceContainer = document.getElementById("announcement-dropdown");
+  const announceContainer = document.getElementById("announcements-data");
   if (announceContainer) {
     announceContainer.innerHTML = announceHTML;
   }

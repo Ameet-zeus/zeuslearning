@@ -1,9 +1,39 @@
+// Color Variables
+$primary-color: #3FD28B;
+$secondary-color: #1F7A54;
+$accent-color: #8DDC97;
+$background-color: #EEEEEE;
+$hover-bg-color: #F3F3F3;
+$text-color: #333;
+$light-text-color: #666;
+$border-color: #a8a8a8;
+$header-bg-color: rgba(0, 0, 0, 0.9);
+$dropdown-bg-color: white;
+$dropdown-footer-bg-color: #1F7A54;
+
+// Font Sizes
+$font-size-small: 0.75rem;
+$font-size-normal: 0.95rem;
+$font-size-medium: 1rem;
+$font-size-large: 1.2rem;
+
+// Spacing
+$padding-small: 12px;
+$padding-medium: 16px;
+$padding-large: 20px;
+$padding-xlarge: 24px;
+
+// Breakpoints
+$breakpoint-small: 580px;
+$breakpoint-medium: 768px;
+$breakpoint-large: 1115px;
+
 html,
 body {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #EEEEEE;
+  background-color: $background-color;
 }
 
 #root {
@@ -16,13 +46,13 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  background-color: #EEEEEE;
+  padding: $padding-large;
+  background-color: $background-color;
 }
 
 .nav {
   height: 7vh;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: $header-bg-color;
   position: relative;
   box-shadow: 0 2px 4px #3AC7EC;
   display: flex;
@@ -41,7 +71,7 @@ body {
   }
 
   .logo-container {
-    padding-left: 24px;
+    padding-left: $padding-xlarge;
     height: 4.4vh;
     display: flex;
     align-items: center;
@@ -50,22 +80,22 @@ body {
   .nav-switcher {
     margin-left: auto;
     display: flex;
-    color: #3FD28B;
+    color: $primary-color;
     border-radius: 4px;
     overflow: hidden;
 
     .nav-tab {
       flex: 1;
       text-align: center;
-      padding: 12px;
+      padding: $padding-small;
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 8px;
       cursor: pointer;
       position: relative;
-      font-size: 0.95rem;
-      color: #3FD28B;
+      font-size: $font-size-normal;
+      color: $primary-color;
       transition: color 0.3s ease;
 
       &.active {
@@ -83,79 +113,63 @@ body {
         }
       }
     }
+  }
 
-    .nav-tab.hamburg:hover+.hamburger-menu,
-    .nav-tab.hamburg:focus+.hamburger-menu {
-      display: flex !important;
-      opacity: 1;
+  .nav-icons {
+    padding-right: 5px;
+    padding-left: 10px;
+    display: flex;
+    gap: 18px;
+    border-radius: 4px;
+
+    img {
+      cursor: pointer;
     }
 
-    .nav-tab.hamburg:hover+.hamburger-menu,
-    .nav-tab.hamburg:focus+.hamburger-menu {
-      display: flex !important;
-      opacity: 1;
+    .announ-img {
+      padding: 2px;
     }
 
     .dropdown-content,
     .hamburger-menu {
-      transition: opacity 0.3s ease;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
     }
 
-
-    .dropdown-content {
-      position: absolute;
-      top: 7vh;
-      /* height of navbar */
-      right: 60px;
-      /* adjust based on icon position */
-      background-color: white;
-      min-width: 160px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-      z-index: 100;
-      border-radius: 4px;
-      display: none;
+    .dropdown-content.show,
+    .hamburger-menu.show {
+      opacity: 1;
+      visibility: visible;
     }
-
-    .dropdown-content.show {
-      display: block;
-    }
-
 
     .hamburg {
+      padding-right: 15px;
       display: none;
     }
   }
-  
-}
-
-// Dropdown hover behavior
-.nav-tab.dropdown:hover + .dropdown-content,
-.nav-tab.dropdown:focus + .dropdown-content {
-  display: block;
-  opacity: 1;
 }
 
 .dropdown-content {
   position: absolute;
   top: 7vh;
   right: 60px;
-  background-color: white;
-  min-width: 160px;
+  background-color: $dropdown-bg-color;
+  width: 315px;
+  height: 582px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   z-index: 100;
   border-radius: 4px;
-  display: none;
-  transition: opacity 0.3s ease;
 
   .dropdown-item {
-    padding: 10px;
+    padding: $padding-small $padding-medium;
     display: flex;
     align-items: center;
     gap: 10px;
     cursor: pointer;
 
     &:hover {
-      background-color: #f1f1f1;
+      background-color: $hover-bg-color;
     }
   }
 }
@@ -165,7 +179,7 @@ body {
   position: absolute;
   top: 7vh;
   right: 0;
-  background-color: white;
+  background-color: $dropdown-bg-color;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
   border-radius: 4px;
   overflow: hidden;
@@ -173,20 +187,14 @@ body {
   display: flex;
   flex-direction: column;
   z-index: 15;
-  transition: opacity 0.3s ease;
-
-  &[hidden] {
-    display: none;
-    opacity: 0;
-  }
 
   .hamburger-tab {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
-    font-size: 0.9rem;
-    color: #1F7A54;
+    padding: $padding-small $padding-medium;
+    font-size: $font-size-normal;
+    color: $secondary-color;
     cursor: pointer;
     user-select: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -203,35 +211,35 @@ body {
     }
 
     &:hover {
-      background-color: #F3F3F3;
+      background-color: $hover-bg-color;
     }
   }
 
   .sub-tab {
     padding-left: 12%;
-    background-color: #F3F3F3;
+    background-color: $hover-bg-color;
     display: none;
   }
 }
 
 .switcher {
   display: flex;
-  background-color: #8DDC97;
+  background-color: $accent-color;
   border-radius: 4px;
   overflow: hidden;
 
   .tab {
     flex: 1;
     text-align: center;
-    padding: 12px;
+    padding: $padding-small;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 8px;
     cursor: pointer;
     position: relative;
-    font-size: 0.95rem;
-    color: #333;
+    font-size: $font-size-normal;
+    color: $text-color;
 
     img {
       width: 18px;
@@ -255,13 +263,13 @@ body {
 .filter {
   margin-top: 1rem;
   display: flex;
-  padding-right: 24px;
-  border-bottom: #a8a8a8 solid 1px;
+  padding-right: $padding-xlarge;
+  border-bottom: $border-color solid 1px;
   align-items: center;
 
   .course-count,
   .sort {
-    font-size: 0.75rem;
+    font-size: $font-size-small;
   }
 
   .sort {
@@ -269,8 +277,8 @@ body {
     margin-left: auto;
 
     select {
-      background-color: #EEEEEE;
-      font-size: 1rem;
+      background-color: $background-color;
+      font-size: $font-size-medium;
       padding: 2px 4px;
       border: none;
       border-bottom: #444 solid 1px;
@@ -280,18 +288,12 @@ body {
   }
 }
 
-.options {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
 .courses-wrapper {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-evenly;
   gap: 20px;
-  padding: 20px;
+  padding: $padding-large;
   margin: 0 auto;
   max-width: 1600px;
 
@@ -301,7 +303,93 @@ body {
   }
 }
 
-@media (max-width: 1115px) {
+.alerts-data > div,
+.announcements-data > div {
+  padding: $padding-small $padding-medium;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  position: relative;
+  border-radius: 4px;
+}
+
+.card-bg1 {
+  background-color: #f9f1f1;
+}
+
+.checkmark-icon,
+.dnd-icon,
+.files img {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+.title,
+.ann-title {
+  font-weight: 600;
+  color: $text-color;
+}
+
+.course-class,
+.ann-course-class,
+.date,
+.ann-name,
+.files-date {
+  color: $light-text-color;
+  font-size: 13px;
+}
+
+.files-date {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.files {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ann-name span {
+  font-weight: bold;
+  margin-right: 4px;
+  color: #444;
+}
+
+.alerts-data > div:hover,
+.announcements-data > div:hover {
+  background-color: $hover-bg-color;
+  cursor: pointer;
+}
+
+.alerts-data,
+.announcements-data {
+  width: 100%;
+  height: 534px;
+  overflow-y: scroll;
+}
+
+.dropdown-footer {
+  display: flex;
+  position: absolute;
+  position: sticky;
+
+  .dropdown-btn {
+    width: 50%;
+    height: 48px;
+    color: $secondary-color;
+    background-color: $dropdown-bg-color;
+    border: none;
+    cursor: pointer;
+  }
+}
+
+@media (max-width: $breakpoint-large) {
   .courses-wrapper {
     justify-content: center !important;
 
@@ -311,7 +399,7 @@ body {
   }
 }
 
-@media (max-width: 580px) {
+@media (max-width: $breakpoint-small) {
   .courses-wrapper {
     margin-left: 0 !important;
     justify-content: center !important;
@@ -322,7 +410,7 @@ body {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: $breakpoint-medium) {
   .big-scr {
     display: none !important;
   }

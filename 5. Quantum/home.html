@@ -44,23 +44,44 @@
           <span>ADMIN</span>
         </div>
 
-        <div class="nav-tab dropdown" data-tab="alerts">
-          <img src="/assets/icons/alerts.svg" alt="Alerts" />
+        
+
+      </div>
+
+      <div class="nav-icons">
+        <div class="alerts-wrapper">
+          <div class="nav-tab dropdown" data-tab="alerts">
+            <img src="/assets/icons/alerts.svg" alt="Alerts" />
+          </div>
+
+          <div class="dropdown-content alerts-dropdown" id="alert-dropdown">
+            <div class="alerts-data" id="alerts-data">
+              <!-- Alerts will be injected here -->
+            </div>
+
+            <div class="dropdown-footer">
+              <button class="dropdown-btn">Show All</button>
+              <button class="dropdown-btn">Create New</button>
+            </div>
+          </div>
         </div>
 
-        <div class="dropdown-content alerts-dropdown" id="alert-dropdown">
-            <!-- Alerts will be injected here -->
+        <div class="announcement-wrapper">
+          <div class="nav-tab dropdown" data-tab="announcements">
+            <img class="announ-img" src="/assets/icons/announcements.svg" alt="Announcements" />
+          </div>
+
+          <div class="dropdown-content announcements-dropdown" id="announcement-dropdown">
+            <div class="announcements-data" id="announcements-data">
+              <!-- Announcements will be injected here -->
+            </div>
+
+            <div class="dropdown-footer">
+              <button class="dropdown-btn">Show All</button>
+              <button class="dropdown-btn">Create New</button>
+            </div>
+          </div>
         </div>
-
-
-        <div class="nav-tab dropdown" data-tab="announcements">
-          <img src="/assets/icons/announcements.svg" alt="Announcements" />
-        </div>
-
-        <div class="dropdown-content announcements-dropdown" id="announcement-dropdown">
-            <!-- Announcements will be injected here -->
-        </div>
-
 
 
 
@@ -69,45 +90,48 @@
           <img src="/assets/icons/account_circle.svg" alt="Profile Picture" />
         </div>
 
-        <div class="nav-tab hamburg">
-          <img src="/assets/icons/hamburger-menu.svg" alt="Profile Picture" />
-        </div>
+        <div class="hamburg-wrapper">
+          <div class="nav-tab hamburg">
+            <img src="/assets/icons/hamburger-menu.svg" alt="Profile Picture" />
+          </div>
 
-        <div id="mobile-menu" class="hamburger-menu" hidden>
-          <div class="hamburger-tab" onclick="switchTab(this, 'dashboard')">
-            <span>DASHBOARD</span>
-          </div>
-          <div class="hamburger-tab" onclick="toggleSubTabs('content')">
-            <span>CONTENT</span>
-            <img src="/assets/icons/down-arrow.svg" alt="" class="arrow">
-          </div>
-          <div class="hamburger-tab sub-tab course-tab" onclick="switchTab(this, 'content1')">
-            <span>COURSE CATALOG</span>
-          </div>
-          <div class="hamburger-tab" onclick="toggleSubTabs('users')">
-            <span>USERS</span>
-            <img src="/assets/icons/down-arrow.svg" alt="" class="arrow">
-          </div>
-          <div class="hamburger-tab sub-tab user-tab" onclick="switchTab(this, 'users1')">
-            <span>USER 1</span>
-          </div>
-          <div class="hamburger-tab" onclick="toggleSubTabs('reports')">
-            <span>REPORTS</span>
-            <img src="/assets/icons/down-arrow.svg" alt="" class="arrow">
-          </div>
-          <div class="hamburger-tab sub-tab report-tab" onclick="switchTab(this, 'reports1')">
-            <span>REPORT 1</span>
-          </div>
-          <div class="hamburger-tab" onclick="toggleSubTabs('admin')">
-            <span>ADMIN</span>
-            <img src="/assets/icons/down-arrow.svg" alt="" class="arrow">
-          </div>
-          <div class="hamburger-tab sub-tab admin-tab" onclick="switchTab(this, 'admin1')">
-            <span>ADMIN 1</span>
+          <div id="mobile-menu" class="hamburger-menu" hidden>
+            <div class="hamburger-tab" onclick="switchTab(this, 'dashboard')">
+              <span>DASHBOARD</span>
+            </div>
+            <div class="hamburger-tab" onclick="toggleSubTabs('content')">
+              <span>CONTENT</span>
+              <img src="/assets/icons/down-arrow.svg" alt="" class="arrow">
+            </div>
+            <div class="hamburger-tab sub-tab course-tab" onclick="switchTab(this, 'content1')">
+              <span>COURSE CATALOG</span>
+            </div>
+            <div class="hamburger-tab" onclick="toggleSubTabs('users')">
+              <span>USERS</span>
+              <img src="/assets/icons/down-arrow.svg" alt="" class="arrow">
+            </div>
+            <div class="hamburger-tab sub-tab user-tab" onclick="switchTab(this, 'users1')">
+              <span>USER 1</span>
+            </div>
+            <div class="hamburger-tab" onclick="toggleSubTabs('reports')">
+              <span>REPORTS</span>
+              <img src="/assets/icons/down-arrow.svg" alt="" class="arrow">
+            </div>
+            <div class="hamburger-tab sub-tab report-tab" onclick="switchTab(this, 'reports1')">
+              <span>REPORT 1</span>
+            </div>
+            <div class="hamburger-tab" onclick="toggleSubTabs('admin')">
+              <span>ADMIN</span>
+              <img src="/assets/icons/down-arrow.svg" alt="" class="arrow">
+            </div>
+            <div class="hamburger-tab sub-tab admin-tab" onclick="switchTab(this, 'admin1')">
+              <span>ADMIN 1</span>
+            </div>
           </div>
         </div>
-
       </div>
+
+      
     </div>
 
     <div class="main-container">
