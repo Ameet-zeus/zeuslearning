@@ -1,0 +1,112 @@
+@import '../variable';
+
+.courses-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    gap: 20px;
+    padding: $padding-large;
+    margin: 0 auto;
+    max-width: 1400px;
+
+
+    .course-card {
+        flex: 0 0 auto;
+        width: 476px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border: 1px solid $border-color;
+        border-radius: 10px;
+        padding: $padding-small;
+        width: 476px;
+        height: 246px;
+        box-shadow: 0 0 10px $hover-bg-color;
+        font-family: sans-serif;
+        background-color: $dropdown-bg-color;
+        position: relative;
+        margin: $padding-small;
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .side-img {
+            width: 132px;
+            height: 157px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: $padding-small;
+        }
+
+        .card-top-content {
+            flex-grow: 1;
+        }
+
+        .star-icon {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+        }
+
+        .course-title {
+            font-weight: bold;
+            font-size: $font-size-medium;
+            margin-bottom: 6px;
+            padding-right: 15%;
+        }
+
+        .course-meta {
+            font-size: $font-size-small;
+            color: $light-text-color;
+            margin-bottom: 4px;
+        }
+
+        .course-meta select {
+            font-size: $font-size-small;
+            padding: 2px 4px;
+            border: none;
+            border-bottom: $light-text-color solid 1px;
+            width: 90%;
+        }
+
+        .course-actions {
+            border-top: $border-color solid 1px;
+            padding-top: 0.5rem;
+            display: flex;
+            justify-content: space-around;
+            margin-top: 12px;
+
+            img {
+                width: 20px;
+                height: 20px;
+                cursor: pointer;
+                transition: transform 0.2s ease;
+
+                &:hover {
+                    transform: scale(1.15);
+                }
+            }
+        }
+    }
+
+    // Utility for icons
+    .big-icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    // Global Styles for Images inside Card
+    .course-card img {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+    }
+
+}
+

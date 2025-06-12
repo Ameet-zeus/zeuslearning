@@ -1,0 +1,95 @@
+.courses-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  gap: 20px;
+  padding: 20px;
+  margin: 0 auto;
+  max-width: 1400px;
+}
+.courses-wrapper .course-card {
+  flex: 0 0 auto;
+  width: 476px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid #a8a8a8;
+  border-radius: 10px;
+  padding: 12px;
+  width: 476px;
+  height: 246px;
+  box-shadow: 0 0 10px #F3F3F3;
+  font-family: sans-serif;
+  background-color: white;
+  position: relative;
+  margin: 12px;
+}
+.courses-wrapper .course-card .card-header {
+  display: flex;
+  align-items: flex-start;
+  position: relative;
+}
+.courses-wrapper .course-card .side-img {
+  width: 132px;
+  height: 157px;
+  -o-object-fit: cover;
+     object-fit: cover;
+  border-radius: 4px;
+  margin-right: 12px;
+}
+.courses-wrapper .course-card .card-top-content {
+  flex-grow: 1;
+}
+.courses-wrapper .course-card .star-icon {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+.courses-wrapper .course-card .course-title {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 6px;
+  padding-right: 15%;
+}
+.courses-wrapper .course-card .course-meta {
+  font-size: 0.75rem;
+  color: #666;
+  margin-bottom: 4px;
+}
+.courses-wrapper .course-card .course-meta select {
+  font-size: 0.75rem;
+  padding: 2px 4px;
+  border: none;
+  border-bottom: #666 solid 1px;
+  width: 90%;
+}
+.courses-wrapper .course-card .course-actions {
+  border-top: #a8a8a8 solid 1px;
+  padding-top: 0.5rem;
+  display: flex;
+  justify-content: space-around;
+  margin-top: 12px;
+}
+.courses-wrapper .course-card .course-actions img {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.courses-wrapper .course-card .course-actions img:hover {
+  transform: scale(1.15);
+}
+.courses-wrapper .big-icon {
+  width: 30px;
+  height: 30px;
+}
+.courses-wrapper .course-card img {
+  width: 20px;
+  height: 20px;
+  -o-object-fit: contain;
+     object-fit: contain;
+}/*# sourceMappingURL=course.css.map */

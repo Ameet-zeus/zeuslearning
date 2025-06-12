@@ -1,0 +1,39 @@
+@import '../variable';
+
+.switcher {
+  display: flex;
+  background-color: $accent-color;
+  border-radius: 4px;
+  overflow: hidden;
+
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: $padding-small;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    position: relative;
+    font-size: $font-size-normal;
+    color: $text-color;
+
+    img {
+      width: 18px;
+      height: 18px;
+    }
+
+    &.active::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0%;
+      width: 100%;
+      height: 4px;
+      background-color: black;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+  }
+}

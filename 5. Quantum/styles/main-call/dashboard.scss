@@ -1,0 +1,47 @@
+@import '../variable';
+@import '../home-scss/basic.scss';
+@import '../home-scss/navbar.scss';
+@import '../home-scss/hamburger.scss';
+@import '../home-scss/switcher.scss';
+@import '../home-scss/dropdown.scss';
+@import '../home-scss/dropdown-data.scss';
+@import '../home-scss/filter.scss';
+@import '../home-scss/course.scss';
+
+
+
+
+
+
+@media (max-width: $breakpoint-large) {
+  .courses-wrapper {
+    justify-content: center !important;
+    width: 1400px !important;
+
+    .course-card {
+      width: 571px !important;
+    }
+  }
+}
+
+@media (max-width: $breakpoint-small) {
+  .courses-wrapper {
+    margin-left: 0 !important;
+    justify-content: center !important;
+
+    .course-card {
+      width: 100% !important;
+    }
+  }
+}
+
+
+@media (max-width: $breakpoint-medium) {
+  .big-scr {
+    display: none !important;
+  }
+
+  .hamburg {
+    display: block !important;
+  }
+}

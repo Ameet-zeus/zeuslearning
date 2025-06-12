@@ -1,0 +1,87 @@
+.nav {
+  height: 7vh;
+  background-color: rgba(0, 0, 0, 0.9);
+  position: relative;
+  box-shadow: 0 2px 4px #3AC7EC;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+}
+.nav .nav-bg {
+  opacity: 0.6;
+  background-image: url("/assets/header_pattern_svg.svg");
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  height: 100%;
+  background-size: cover;
+}
+.nav .logo-container {
+  padding-left: 24px;
+  height: 4.4vh;
+  display: flex;
+  align-items: center;
+}
+.nav .nav-switcher {
+  margin-left: auto;
+  display: flex;
+  color: #3FD28B;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.nav .nav-switcher .nav-tab {
+  flex: 1;
+  text-align: center;
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  position: relative;
+  font-size: 0.95rem;
+  color: #3FD28B;
+  transition: color 0.3s ease;
+}
+.nav .nav-switcher .nav-tab.active {
+  color: white;
+}
+.nav .nav-switcher .nav-tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 4px;
+  background-color: white;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+.nav .nav-icons {
+  padding-right: 5px;
+  padding-left: 10px;
+  display: flex;
+  gap: 18px;
+  border-radius: 4px;
+}
+.nav .nav-icons img {
+  cursor: pointer;
+}
+.nav .nav-icons .announ-img {
+  padding: 2px;
+}
+.nav .nav-icons .dropdown-content,
+.nav .nav-icons .hamburger-menu {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.nav .nav-icons .dropdown-content.show,
+.nav .nav-icons .hamburger-menu.show {
+  opacity: 1;
+  visibility: visible;
+}
+.nav .nav-icons .hamburg {
+  padding-right: 15px;
+  display: none;
+}/*# sourceMappingURL=navbar.css.map */

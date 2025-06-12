@@ -1,0 +1,102 @@
+@import '../variable';
+
+.nav {
+  height: 7vh;
+  background-color: $header-bg-color;
+  position: relative;
+  box-shadow: 0 2px 4px #3AC7EC;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+
+  .nav-bg {
+    opacity: 0.6;
+    background-image: url('/assets/header_pattern_svg.svg');
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    height: 100%;
+    background-size: cover;
+  }
+
+  .logo-container {
+    padding-left: $padding-xlarge;
+    height: 4.4vh;
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-switcher {
+    margin-left: auto;
+    display: flex;
+    color: $primary-color;
+    border-radius: 4px;
+    overflow: hidden;
+
+    .nav-tab {
+      flex: 1;
+      text-align: center;
+      padding: $padding-small;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      position: relative;
+      font-size: $font-size-normal;
+      color: $primary-color;
+      transition: color 0.3s ease;
+
+      &.active {
+        color: white;
+
+        &::after {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          width: 100%;
+          height: 4px;
+          background-color: white;
+          border-radius: 2px;
+          transition: all 0.3s ease;
+        }
+      }
+    }
+  }
+
+  // Nav Icons Section
+  .nav-icons {
+    padding-right: 5px;
+    padding-left: 10px;
+    display: flex;
+    gap: 18px;
+    border-radius: 4px;
+
+    img {
+      cursor: pointer;
+    }
+
+    .announ-img {
+      padding: 2px;
+    }
+
+    .dropdown-content,
+    .hamburger-menu {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .dropdown-content.show,
+    .hamburger-menu.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .hamburg {
+      padding-right: 15px;
+      display: none;
+    }
+  }
+}

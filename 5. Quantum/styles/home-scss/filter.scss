@@ -1,0 +1,29 @@
+@import '../variable';
+
+.filter {
+  margin-top: 1rem;
+  display: flex;
+  padding-right: $padding-xlarge;
+  border-bottom: $border-color solid 1px;
+  align-items: center;
+
+  .course-count,
+  .sort {
+    font-size: $font-size-small;
+  }
+
+  .sort {
+    min-width: 220px;
+    margin-left: auto;
+
+    select {
+      background-color: $background-color;
+      font-size: $font-size-medium;
+      padding: 2px 4px;
+      border: none;
+      border-bottom: #444 solid 1px;
+      max-width: 20rem;
+      min-width: 8rem;
+    }
+  }
+}

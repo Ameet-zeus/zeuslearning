@@ -1,0 +1,41 @@
+@import '../variable';
+
+.dropdown-content {
+  position: absolute;
+  top: 7vh;
+  right: 60px;
+  background-color: $dropdown-bg-color;
+  width: 315px;
+  height: 582px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  border-radius: 4px;
+
+  .dropdown-item {
+    padding: $padding-small $padding-medium;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $hover-bg-color;
+    }
+  }
+}
+
+.dropdown-footer {
+  display: flex;
+  position: absolute;
+  position: sticky;
+
+  .dropdown-btn {
+    width: 50%;
+    height: 48px;
+    color: $secondary-color;
+    background-color: $dropdown-bg-color;
+    border: none;
+    cursor: pointer;
+  }
+}
+
