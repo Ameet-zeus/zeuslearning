@@ -1,77 +1,33 @@
 import { createCourseCard } from "../component/courseCard.js";
 import { renderFooter } from "../component/footer.js";
+import { loadAlerts } from '../component/alerts.js';
+import { loadAnnouncements } from '../component/announcement.js';
 
-// COURSE DATA
-const courseData = [
-  {
-    title: "Acceleration",
-    subject: "Physics",
-    grade: "7•2",
-    units: 4,
-    lessons: 18,
-    topics: 24,
-    teacher: "Mr. Frank's Class B",
-    students: 50,
-    startDate: "21-Jan-2020",
-    endDate: "21-Aug-2020",
-    image: "assets/images/imageMask-1.svg",
-    starred: true,
-    expired: false,
-    icons: { preview: true, calendar: true, clone: true, report: true }
-  },
-  {
-    title: "Displacement, Velocity and Speed",
-    subject: "Physics",
-    grade: "6•3",
-    units: 2,
-    lessons: 15,
-    topics: 20,
-    teacher: "No Classes",
-    students: null,
-    startDate: null,
-    endDate: null,
-    image: "assets/images/imageMask-2.svg",
-    starred: true,
-    expired: false,
-    icons: { preview: true, calendar: false, clone: false, report: true }
-  },
-  {
-    title: "Introduction to Biology: Microorganisms...",
-    subject: "Biology",
-    grade: "4•1",
-    units: 5,
-    lessons: 16,
-    topics: 22,
-    teacher: "All Classes",
-    students: 300,
-    startDate: null,
-    endDate: null,
-    image: "assets/images/imageMask.svg",
-    starred: true,
-    expired: false,
-    icons: { preview: true, calendar: false, clone: false, report: true }
-  },
-  {
-    title: "Introduction to High School Mathematics",
-    subject: "Mathematics",
-    grade: "8•3",
-    units: null,
-    lessons: null,
-    topics: null,
-    teacher: "Mr. Frank's Class A",
-    students: 44,
-    startDate: "14-Oct-2019",
-    endDate: "20-Oct-2020",
-    image: "assets/images/imageMask-3.svg",
-    starred: false,
-    expired: true,
-    icons: { preview: true, calendar: true, clone: true, report: true }
+
+
+// ALERTS AND ANNOUNCEMENTS DROPDOWN
+document.addEventListener("DOMContentLoaded", () => {
+  const alertContainer = document.getElementById("alerts-data");
+  const announceContainer = document.getElementById("announcements-data");
+  if (alertContainer) {
+    loadAlerts(alertContainer);
   }
-];
+  if (announceContainer) {
+    loadAnnouncements(announceContainer);
+  }
+});
 
 // RENDER COURSES
-const container = document.getElementById("course-container");
-courseData.forEach((course) => container.appendChild(createCourseCard(course)));
+fetch('../json/courses.json')
+  .then(response => response.json())
+  .then(data => {
+    const container = document.getElementById("course-container");
+    data.forEach(course => {
+      const card = createCourseCard(course);
+      container.appendChild(card);
+    });
+  });
+
 
 // RENDER FOOTER
 const container2 = document.getElementById("footer-container");
@@ -164,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-
+//TOGGLE INSPECTORS
 window.switchTab = switchTab;
 window.switchTab2 = switchTab2;
 window.toggleSubTabs = toggleSubTabs;

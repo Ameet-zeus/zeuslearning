@@ -1,45 +1,199 @@
-.announcements-data > div {
-  padding: 12px 16px;
-  border-bottom: 1px solid #e0e0e0;
+.dropdown-content {
+  position: absolute;
+  top: 7vh;
+  right: 60px;
+  background-color: white;
+  width: 315px;
+  height: 582px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  border-radius: 6px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  overflow: hidden;
+}
+
+.announcements-data {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+  margin: 0;
+}
+
+.announcements-data > div {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px;
+  margin: 0;
+  border-radius: 0;
+  background-color: transparent;
+  border-bottom: 1px solid #e0e0e0;
   font-size: 14px;
-  position: relative;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
 }
-.announcements-data > div:hover {
-  background-color: #F3F3F3;
-  cursor: pointer;
+.announcements-data > div.card-bg1 {
+  background-color: #f9f1f1;
 }
-.announcements-data > div .toggle-read {
-  width: 16px;
-  height: 16px;
-  margin-bottom: 4px;
+.announcements-data > div .header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 }
-.announcements-data > div .ann-name span {
+.announcements-data > div .header-row .ann-name {
   font-weight: bold;
-  margin-right: 4px;
   color: #444;
 }
-.announcements-data > div .ann-title {
-  font-weight: 600;
-  color: #333;
+.announcements-data > div .header-row .toggle-read {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-left: 10px;
 }
-.announcements-data > div .ann-course-class {
-  color: #666;
+.announcements-data > div .ann-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  margin-top: 4px;
+}
+.announcements-data > div .ann-content .ann-title {
+  font-weight: 500;
+  color: #222;
+}
+.announcements-data > div .ann-content .ann-course-class {
+  color: #777;
   font-size: 13px;
 }
-.announcements-data > div .files-date {
+.announcements-data > div .ann-content .files-date {
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 13px;
-  color: #666;
+  color: #888;
 }
-.announcements-data > div .files-date .files {
+.announcements-data > div .ann-content .files-date .files {
   display: flex;
   align-items: center;
-  gap: 4px;
+}
+.announcements-data > div .ann-content .files-date .files img {
+  width: 15px;
+}
+.announcements-data > div .ann-content .files-date .files .date {
+  margin-left: auto;
+}
+
+.dropdown-footer {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #ccc;
+}
+.dropdown-footer .dropdown-btn {
+  width: 50%;
+  height: 48px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #1F7A54;
+  background-color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 0 0 4px 4px;
+}
+.dropdown-footer .dropdown-btn:hover {
+  background-color: white;
+}
+
+.alerts-dropdown {
+  position: absolute;
+  top: 7vh;
+  right: 60px;
+  background-color: white;
+  width: 315px;
+  height: 582px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.alerts-data {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+}
+
+.alert-card {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 14px;
+}
+.alert-card.card-bg1 {
+  background-color: #f9f1f1;
+}
+.alert-card .header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.alert-card .header-row .alert-title {
+  font-weight: 600;
+  color: #333;
+  font-size: 15px;
+  line-height: 1.4;
+  flex: 1;
+}
+.alert-card .header-row .toggle-alert-read {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.alert-card .alert-course {
+  font-size: 13px;
+  color: #999;
+  margin: 4px 0 0;
+}
+.alert-card .alert-date {
+  font-size: 13px;
+  color: #666;
+  margin-top: 4px;
+  text-align: right;
+  align-self: flex-end;
+}
+
+.dropdown-footer {
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid #ccc;
+}
+.dropdown-footer .dropdown-btn-2 {
+  width: 100%;
+  height: 48px;
+  color: #1F7A54;
+  background-color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.alerts-data::-webkit-scrollbar,
+.announcements-data::-webkit-scrollbar {
+  width: 6px;
+}
+
+.alerts-data::-webkit-scrollbar-thumb,
+.announcements-data::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.alerts-data::-webkit-scrollbar-track,
+.announcements-data::-webkit-scrollbar-track {
+  background: transparent;
 }/*# sourceMappingURL=dropdown-data.css.map */

@@ -100,3 +100,22 @@
     }
   }
 }
+
+
+@media (max-width: $breakpoint-medium) {
+
+  .hamburg {
+    display: block !important;
+  }
+}
+
+
+@media (max-width: $breakpoint-medium) {
+  .big-scr {
+    display: none !important;
+  }
+
+  .hamburg {
+    display: block !important;
+  }
+}

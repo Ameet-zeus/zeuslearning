@@ -84,4 +84,18 @@
 .nav .nav-icons .hamburg {
   padding-right: 15px;
   display: none;
+}
+
+@media (max-width: 768px) {
+  .hamburg {
+    display: block !important;
+  }
+}
+@media (max-width: 768px) {
+  .big-scr {
+    display: none !important;
+  }
+  .hamburg {
+    display: block !important;
+  }
 }/*# sourceMappingURL=navbar.css.map */

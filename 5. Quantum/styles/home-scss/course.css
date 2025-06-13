@@ -1,22 +1,22 @@
 .courses-wrapper {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-evenly;
+  justify-content: center;
   gap: 20px;
   padding: 20px;
   margin: 0 auto;
   max-width: 1400px;
 }
 .courses-wrapper .course-card {
-  flex: 0 0 auto;
-  width: 476px;
+  flex: 1 1 450px;
+  max-width: 476px;
+  min-width: 300px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   border: 1px solid #a8a8a8;
   border-radius: 10px;
   padding: 12px;
-  width: 476px;
   height: 246px;
   box-shadow: 0 0 10px #F3F3F3;
   font-family: sans-serif;
@@ -92,4 +92,24 @@
   height: 20px;
   -o-object-fit: contain;
      object-fit: contain;
+}
+
+@media (max-width: 1115px) {
+  .courses-wrapper {
+    justify-content: center;
+  }
+  .course-card {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+}
+@media (max-width: 580px) {
+  .courses-wrapper {
+    margin-left: 0;
+    justify-content: center;
+  }
+  .course-card {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
 }/*# sourceMappingURL=course.css.map */

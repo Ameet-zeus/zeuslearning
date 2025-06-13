@@ -20,7 +20,7 @@ export function createCourseCard(course) {
         <div class="course-meta">${course.students ? course.students + ' Students' : ''}</div>
         <div class="course-meta">${course.startDate && course.endDate ? course.startDate + ' - ' + course.endDate : ''}</div>
       </div>
-      <img class="star-icon" src="assets/${course.starred ? '../assets/icons/favourite.svg' : '../assets/icons/fav-off.svg'}" alt="Star">
+      <img class="star-icon" src="assets/${course.starred ? '../assets/icons/favourite.svg' : '../assets/icons/fav-off.svg'}" alt="Star" style="cursor: pointer;">
     </div>
 
     <div class="course-actions">
@@ -30,6 +30,13 @@ export function createCourseCard(course) {
       ${getIconHTML('reports', 'Report', course.icons?.report)}
     </div>
   `;
+
+  // Toggle favorite star on click
+  const starIcon = card.querySelector('.star-icon');
+  starIcon.addEventListener('click', () => {
+    course.starred = !course.starred; // toggle state
+    starIcon.src = `assets/${course.starred ? '../assets/icons/favourite.svg' : '../assets/icons/fav-off.svg'}`;
+  });
 
   return card;
 }
