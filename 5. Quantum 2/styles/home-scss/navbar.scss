@@ -1,0 +1,170 @@
+@import "../variable";
+
+.nav {
+  height: 8vh; // Updated to 8vh
+  background-color: rgba(0, 0, 0, 0.9); // $header-bg-color
+  position: relative;
+  display: flex;
+  align-items: center; // Ensure vertical centering of items
+  z-index: 1;
+
+  .nav-bg {
+    opacity: 0.6;
+    background-image: url("../../assets/header_pattern_svg.svg");
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    height: 100%;
+    background-size: cover;
+  }
+
+  .logo-container {
+    padding-left: 24px; // $padding-xlarge
+    height: 100%; // Ensure full height to maintain alignment
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-switcher {
+    margin-left: auto;
+    display: flex;
+    color: #3FD28B; // $primary-color
+    border-radius: 4px;
+    overflow: hidden;
+
+    .nav-tab {
+      flex: 1;
+      text-align: center;
+      padding: 0 12px; // $padding-small adjusted for symmetry
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      position: relative;
+      font-size: 0.95rem; // $font-size-normal
+      color: #3FD28B; // $primary-color
+      transition: color 0.3s ease;
+
+      // Adjust span to make it centered properly
+      span {
+        transition: color 0.3s ease;
+      }
+
+      &:hover span {
+        color: white;
+      }
+
+      &.active {
+        color: white;
+        border-bottom: 2px solid white; // Fix underline issue (adjust thickness if necessary)
+        padding-bottom: 5px; // Adjust padding to avoid gap with underline
+      }
+    }
+  }
+
+  // Nav Icons Section
+  .nav-icons {
+    padding-right: 5px;
+    padding-left: 10px;
+    display: flex;
+    gap: 24px;
+    border-radius: 4px;
+
+    img {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .announ-img {
+      padding: 2px;
+    }
+
+    .dropdown-content,
+    .hamburger-menu {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .dropdown-content.show,
+    .hamburger-menu.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .hamburg {
+      padding-right: 15px;
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 770px) { // $breakpoint-medium
+  .nav {
+    box-shadow: 0 2px 4px #3ac7ec;
+  }
+
+  .hamburg {
+    display: block !important;
+  }
+
+  .big-scr {
+    display: none !important;
+  }
+}
+
+// Badge
+.nav-tab {
+  position: relative;
+
+  img {
+    width: 32px;
+    height: 32px;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover .badge {
+    display: block !important; // Prevent badge from disappearing on hover
+  }
+}
+
+.badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #0066cc;
+  color: white;
+  border-radius: 50%;
+  width: 18px; // Adjust width for proper alignment
+  height: 18px; // Adjust height for proper alignment
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 10;
+  transition: all 0.3s ease;
+
+  // Adjusted positioning to fix slight misalignment
+  right: -8px; // Move to the right to fix alignment issue with the numbers
+}
+
+.pfp-tab {
+  position: relative;
+}
+
+.badge-t {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  font-weight: bold;
+  font-size: 12px;
+  border: 1px solid #000000;
+  transition: all 0.3s ease;
+
+  // Ensure the badge-t does not disappear on hover
+  display: flex !important; // Always keep badge-t visible
+}

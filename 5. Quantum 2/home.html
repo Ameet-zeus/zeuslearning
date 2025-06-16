@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quantum</title>
+    <link rel="stylesheet" href="/styles/main-call/dashboard.css" />
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/component/footer.css" />
+    <script type="module"  src="/script/dashboard.js" defer></script>
+  </head>
+
+  <body>
+    <div id="root">
+      <div class="nav">
+        <div class="nav-bg"></div>
+        <div class="logo-container">
+          <img
+            src="/assets/icons/logo used in header.svg"
+            alt="Quantum Logo"
+            id="logo"
+          />
+        </div>
+
+        <!-- Desktop Nav Tabs -->
+        <ul class="nav-switcher">
+          <li
+            class="nav-tab big-scr active"
+            onclick="switchTab(this, 'dashboard')"
+          >
+            <span>DASHBOARD</span>
+          </li>
+          <li class="nav-tab big-scr" onclick="switchTab(this, 'content')">
+            <span>CONTENT</span>
+          </li>
+          <li class="nav-tab big-scr" onclick="switchTab(this, 'users')">
+            <span>USERS</span>
+          </li>
+          <li class="nav-tab big-scr" onclick="switchTab(this, 'reports')">
+            <span>REPORTS</span>
+          </li>
+          <li class="nav-tab big-scr" onclick="switchTab(this, 'admin')">
+            <span>ADMIN</span>
+          </li>
+        </ul>
+
+        <!-- Right Nav Icons -->
+        <div class="nav-icons">
+          <!-- Alerts -->
+          <div class="alerts-wrapper">
+            <div class="nav-tab dropdown" data-tab="alerts">
+              <img src="/assets/icons/alerts.svg" alt="Alerts" />
+              <div class="badge" id="alerts-bubble"></div>
+            </div>
+            <div class="dropdown-content alerts-dropdown" id="alert-dropdown">
+              <div class="alerts-data" id="alerts-data"></div>
+              <div class="dropdown-footer">
+                <button class="dropdown-btn-2">Show All</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Announcements -->
+          <div class="announcement-wrapper">
+            <div class="nav-tab dropdown" data-tab="announcements">
+              <img
+                class="announ-img"
+                src="/assets/icons/announcements.svg"
+                alt="Announcements"
+              />
+              <div class="badge" id="announcements-bubble"></div>
+            </div>
+            <div
+              class="dropdown-content announcements-dropdown"
+              id="announcement-dropdown"
+            >
+              <div class="announcements-data" id="announcements-data"></div>
+              <div class="dropdown-footer">
+                <button class="dropdown-btn">Show All</button>
+                <button class="dropdown-btn">Create New</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Icon -->
+          <div class="nav-tab pfp-tab">
+            <img src="assets/icons/account_circle.svg" alt="Profile" />
+            <div class="badge badge-t">T</div>
+          </div>
+
+          <!-- Hamburger Menu -->
+          <div class="hamburg-wrapper">
+            <div class="nav-tab hamburg">
+              <img
+                src="/assets/icons/hamburger-menu.svg"
+                alt="Profile Picture"
+              />
+            </div>
+
+            <!-- Mobile Nav Menu (UL version) -->
+            <ul id="mobile-menu" class="hamburger-menu" hidden>
+              <li
+                class="hamburger-tab"
+                onclick="toggleSubTabs('dashboard'); switchTab(this, 'dashboard')"
+              >
+                <span>DASHBOARD</span>
+              </li>
+              <li class="hamburger-tab" onclick="toggleSubTabs('content')">
+                <span>CONTENT</span>
+                <img src="/assets/icons/down-arrow.svg" alt="" class="arrow" />
+              </li>
+              <li
+                class="hamburger-tab sub-tab course-tab"
+                onclick="switchTab(this, 'content1')"
+              >
+                <span>COURSE CATALOG</span>
+              </li>
+              <li class="hamburger-tab" onclick="toggleSubTabs('users')">
+                <span>USERS</span>
+                <img src="/assets/icons/down-arrow.svg" alt="" class="arrow" />
+              </li>
+              <li
+                class="hamburger-tab sub-tab user-tab"
+                onclick="switchTab(this, 'users1')"
+              >
+                <span>USER 1</span>
+              </li>
+              <li class="hamburger-tab" onclick="toggleSubTabs('reports')">
+                <span>REPORTS</span>
+                <img src="/assets/icons/down-arrow.svg" alt="" class="arrow" />
+              </li>
+              <li
+                class="hamburger-tab sub-tab report-tab"
+                onclick="switchTab(this, 'reports1')"
+              >
+                <span>REPORT 1</span>
+              </li>
+              <li class="hamburger-tab" onclick="toggleSubTabs('admin')">
+                <span>ADMIN</span>
+                <img src="/assets/icons/down-arrow.svg" alt="" class="arrow" />
+              </li>
+              <li
+                class="hamburger-tab sub-tab admin-tab"
+                onclick="switchTab(this, 'admin1')"
+              >
+                <span>ADMIN 1</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-container">
+        <div class="switcher">
+          <div class="tab active" onclick="switchTab2(this, 'courses')">
+            <img src="assets/icons/courses.svg" alt="Courses" />
+            <span><strong>4</strong> Courses</span>
+          </div>
+          <div class="tab" onclick="switchTab2(this, 'classes')">
+            <img src="assets/icons/classes.svg" alt="Classes" />
+            <span><strong>4</strong> Classes</span>
+          </div>
+        </div>
+
+        <div class="filter">
+          <div class="course-count">Showing 4 of 4 courses</div>
+          <div class="sort">
+            Sort By:
+            <select name="" id="">
+              <option value="">Course Name</option>
+            </select>
+          </div>
+          <img src="/assets/icons/sort.svg" alt="" />
+        </div>
+
+        <div id="course-container" class="courses-wrapper"></div>
+      </div>
+
+      <div id="footer-container"></div>
+    </div>
+  </body>
+</html>

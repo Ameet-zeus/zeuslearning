@@ -1,0 +1,233 @@
+@import '../variable';
+
+.dropdown-content {
+  position: absolute;
+  top: 7vh;
+  right: 60px;
+  background-color: $dropdown-bg-color;
+  width: 315px;
+  height: 582px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.announcements-data {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+  margin: 0;
+}
+
+.announcements-data > div {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px;
+  margin: 0; // Remove spacing between cards
+  border-radius: 0; // Remove round edges
+  background-color: transparent; // Match alert style
+  border-bottom: 1px solid #e0e0e0; // Match alerts
+  font-size: 14px;
+
+  // Optional: Add .card-bg1 support if needed
+  &.card-bg1 {
+    background-color: #f9f1f1;
+  }
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    .ann-name {
+      font-weight: bold;
+      color: #444;
+    }
+
+    .toggle-read {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-left: 10px;
+    }
+  }
+
+  .ann-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+    margin-top: 4px;
+
+    .ann-title {
+      font-weight: 500;
+      color: #222;
+    }
+
+    .ann-course-class {
+      color: #777;
+      font-size: 13px;
+    }
+
+    .files-date {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #888;
+
+      .files {
+        display: flex;
+        align-items: center;
+
+        img{
+          width: 15px;
+        }
+
+        .date{
+          margin-left: auto;
+        }
+      }
+    }
+  }
+}
+
+.dropdown-footer {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #ccc;
+
+  .dropdown-btn {
+    width: 50%;
+    height: 48px;
+    font-weight: 500;
+    font-size: 14px;
+    color: $secondary-color;
+    background-color: $dropdown-bg-color;
+    border: none;
+    cursor: pointer;
+    border-radius: 0 0 4px 4px;
+
+    &:hover {
+      background-color: lighten($dropdown-bg-color, 5%);
+    }
+  }
+}
+
+
+
+
+
+
+.alerts-dropdown {
+  position: absolute;
+  top: 7vh;
+  right: 60px;
+  background-color: $dropdown-bg-color;
+  width: 315px;
+  height: 582px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.alerts-data {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+}
+
+.alert-card {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 14px;
+
+  &.card-bg1 {
+    background-color: #f9f1f1;
+  }
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+
+    .alert-title {
+      font-weight: 600;
+      color: $text-color;
+      font-size: 15px;
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .toggle-alert-read {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+  }
+
+  .alert-course {
+    font-size: 13px;
+    color: #999;
+    margin: 4px 0 0;
+  }
+
+  .alert-date {
+    font-size: 13px;
+    color: #666;
+    margin-top: 4px;
+    text-align: right;
+    align-self: flex-end;
+  }
+}
+
+.dropdown-footer {
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid #ccc;
+
+  .dropdown-btn-2 {
+    width: 100%;
+    height: 48px;
+    color: $secondary-color;
+    background-color: $dropdown-bg-color;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+  }
+}
+
+
+
+
+//SCROLLBAR
+
+.alerts-data::-webkit-scrollbar,
+.announcements-data::-webkit-scrollbar {
+  width: 6px;
+}
+
+.alerts-data::-webkit-scrollbar-thumb,
+.announcements-data::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.alerts-data::-webkit-scrollbar-track,
+.announcements-data::-webkit-scrollbar-track {
+  background: transparent;
+}

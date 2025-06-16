@@ -1,0 +1,27 @@
+#footer-container {
+  background-color: #EEEEEE;
+  font-size: 0.875rem;
+}
+
+#foot1 {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+#foot2 {
+  text-align: center;
+  background-color: #E0E1E1;
+  padding: 0.5rem 0;
+}
+
+#logo-foot {
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+.hyperlink {
+  color: #1F7A54;
+  text-decoration: none;
+  margin: 0 0.5rem;
+}

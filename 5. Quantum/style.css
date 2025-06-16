@@ -27,9 +27,10 @@ select {
   padding-right: 2rem;
 }
 
+
+
 .nav-tab {
   position: relative;
-
 }
 
 .badge {
@@ -54,6 +55,7 @@ select {
   height: 24px;
 }
 
-.nav-tab:hover .badge {
+/* Hide badge when hovering over the nav-tab (icon) or the dropdown content */
+.nav-tab-container:hover .badge {
   display: none;
 }

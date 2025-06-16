@@ -1,0 +1,27 @@
+@import '../variable'; // Global variables, colors, font sizes, breakpoints, etc.
+
+// Layouts
+@import '../home-scss/basic.scss'; // Base styles and layout
+@import '../home-scss/navbar.scss'; // Navbar styles
+
+// UI Components
+@import '../home-scss/hamburger.scss'; // Hamburger menu styles
+@import '../home-scss/switcher.scss'; // Switcher (tabs) styles
+@import '../home-scss/dropdown.scss'; // Dropdown component styles
+@import '../home-scss/dropdown-data.scss'; // Dropdown data content styling (announcements, alerts)
+@import '../home-scss/filter.scss'; // Filter bar styles
+
+// Pages/Content
+@import '../home-scss/course.scss'; // Course cards or content display
+
+
+
+@media (max-width: $breakpoint-medium) {
+  .big-scr {
+    display: none !important;
+  }
+
+  .hamburg {
+    display: block !important;
+  }
+}

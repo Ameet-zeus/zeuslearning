@@ -10,8 +10,9 @@
   z-index: 1;
 
   .nav-bg {
+    width: 100%;
     opacity: 0.6;
-    background-image: url('/assets/header_pattern_svg.svg');
+    background-image: url('../../assets/header_pattern_svg.svg');
     position: absolute;
     top: 0;
     left: 0;

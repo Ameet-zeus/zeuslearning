@@ -1,0 +1,28 @@
+.filter {
+  margin-top: 1rem;
+  display: flex;
+  padding-right: 24px;
+  border-bottom: #a8a8a8 solid 1px;
+  align-items: center;
+}
+.filter .course-count,
+.filter .sort {
+  font-size: 0.75rem;
+}
+.filter .sort {
+  min-width: 220px;
+  margin-left: auto;
+}
+.filter .sort select {
+  background-color: #EEEEEE;
+  font-size: 1rem;
+  padding: 2px 4px;
+  border: none;
+  border-bottom: #444 solid 1px;
+  max-width: 20rem;
+  min-width: 8rem;
+}
+
+.filter-button {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}/*# sourceMappingURL=filter.css.map */
