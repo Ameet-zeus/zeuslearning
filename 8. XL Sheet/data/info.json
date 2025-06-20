@@ -1,0 +1,5 @@
+[
+  { "id": 1, "firstName": "Raj", "lastName": "Solanki", "Age": 30, "Salary": 1000000 },
+  { "id": 2, "firstName": "Simran", "lastName": "Gupta", "Age": 25, "Salary": 800000 },
+  { "id": 3, "firstName": "Ravi", "lastName": "Sharma", "Age": 35, "Salary": 1200000 }
+]

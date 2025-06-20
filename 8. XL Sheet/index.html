@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Virtual Scroll Spreadsheet</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+    }
+    #container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    #spreadsheet {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    #textInput {
+      position: absolute;
+      display: none;
+      font-size: 16px;
+      border: 1px solid blue;
+      z-index: 10;
+      outline: none;
+    }
+    #scrollArea {
+      width: 100%;
+      height: 100%;
+      overflow: scroll;
+    }
+    #scroller {
+      width: 10000px;  /* Fake scroll area */
+      height: 3000000px; /* 100k rows × 30px */
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="scrollArea">
+      <div id="scroller"></div>
+    </div>
+    <canvas id="spreadsheet"></canvas>
+    <input type="text" id="textInput">
+  </div>
+
+  <script>
+    const scrollArea = document.getElementById("scrollArea");
+    const canvas = document.getElementById("spreadsheet");
+    const ctx = canvas.getContext("2d");
+    const input = document.getElementById("textInput");
+
+    const cellWidth = 100;
+    const cellHeight = 30;
+    const rows = 100000;
+    const cols = 100;
+
+    const data = Array.from({ length: rows }, () => Array(cols).fill(""));
+
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+
+    canvas.width = screenWidth;
+    canvas.height = screenHeight;
+
+    let selectedCell = null;
+
+    function drawGrid() {
+      const scrollLeft = scrollArea.scrollLeft;
+      const scrollTop = scrollArea.scrollTop;
+
+      const startCol = Math.floor(scrollLeft / cellWidth);
+      const startRow = Math.floor(scrollTop / cellHeight);
+
+      const endCol = startCol + Math.ceil(canvas.width / cellWidth);
+      const endRow = startRow + Math.ceil(canvas.height / cellHeight);
+
+      const offsetX = scrollLeft % cellWidth;
+      const offsetY = scrollTop % cellHeight;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.font = "16px Arial";
+      ctx.textBaseline = "middle";
+
+      for (let r = startRow; r <= endRow && r < rows; r++) {
+        for (let c = startCol; c <= endCol && c < cols; c++) {
+          const x = (c - startCol) * cellWidth - offsetX;
+          const y = (r - startRow) * cellHeight - offsetY;
+
+          ctx.strokeStyle = "#ccc";
+          ctx.strokeRect(x, y, cellWidth, cellHeight);
+          ctx.fillStyle = "black";
+          ctx.fillText(data[r][c], x + 5, y + cellHeight / 2);
+        }
+      }
+
+      if (selectedCell) {
+        const [sr, sc] = selectedCell;
+        if (sr >= startRow && sr <= endRow && sc >= startCol && sc <= endCol) {
+          const x = (sc - startCol) * cellWidth - offsetX;
+          const y = (sr - startRow) * cellHeight - offsetY;
+          ctx.strokeStyle = "blue";
+          ctx.lineWidth = 2;
+          ctx.strokeRect(x, y, cellWidth, cellHeight);
+        }
+      }
+    }
+
+    scrollArea.addEventListener("scroll", drawGrid);
+
+    canvas.addEventListener("click", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left + scrollArea.scrollLeft;
+      const y = e.clientY - rect.top + scrollArea.scrollTop;
+
+      const col = Math.floor(x / cellWidth);
+      const row = Math.floor(y / cellHeight);
+
+      if (row >= rows || col >= cols) return;
+
+      selectedCell = [row, col];
+      const value = data[row][col];
+
+      input.style.left = `${(col * cellWidth) - scrollArea.scrollLeft}px`;
+      input.style.top = `${(row * cellHeight) - scrollArea.scrollTop}px`;
+      input.style.width = `${cellWidth}px`;
+      input.style.height = `${cellHeight}px`;
+      input.value = value;
+      input.style.display = "block";
+      input.focus();
+
+      drawGrid();
+    });
+
+    input.addEventListener("blur", () => {
+      if (selectedCell) {
+        const [r, c] = selectedCell;
+        data[r][c] = input.value;
+        input.style.display = "none";
+        drawGrid();
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      drawGrid();
+    });
+
+    drawGrid(); // Initial render
+  </script>
+</body>
+</html>
