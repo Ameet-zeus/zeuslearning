@@ -1,0 +1,15 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#container {
+    width: 100vw;
+    height: 98vh;
+    overflow: auto;
+}
+
+#spreadsheet {
+    display: block;
+}

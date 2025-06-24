@@ -1,4 +1,3 @@
-// Configuration class for better maintainability
 class SpreadsheetConfig {
   static DEFAULT_CELL_WIDTH = 100;
   static DEFAULT_CELL_HEIGHT = 30;
@@ -21,7 +20,6 @@ class SpreadsheetConfig {
   };
 }
 
-// Utility class for common operations
 class SpreadsheetUtils {
   static getColumnLabel(index) {
     let label = "";
@@ -76,7 +74,6 @@ class SpreadsheetUtils {
   }
 }
 
-// Data model class
 class SpreadsheetData {
   constructor(rows, cols) {
     this.rows = rows;
@@ -84,7 +81,7 @@ class SpreadsheetData {
     this.data = Array.from({ length: rows }, () => Array(cols).fill(""));
     this.colWidths = new Array(cols).fill(SpreadsheetConfig.DEFAULT_CELL_WIDTH);
     this.rowHeights = new Array(rows).fill(SpreadsheetConfig.DEFAULT_CELL_HEIGHT);
-    this.dirtyRegions = new Set(); // Track dirty regions for partial redraws
+    this.dirtyRegions = new Set();
   }
 
   getCellValue(row, col) {
@@ -123,7 +120,6 @@ class SpreadsheetData {
   }
 }
 
-// Viewport manager for efficient rendering
 class ViewportManager {
   constructor(scrollArea, data) {
     this.scrollArea = scrollArea;
@@ -160,7 +156,6 @@ class ViewportManager {
   }
 }
 
-// Renderer class for drawing operations
 class SpreadsheetRenderer {
   constructor(canvas, data) {
     this.canvas = canvas;
@@ -176,6 +171,7 @@ class SpreadsheetRenderer {
     this.canvas.height = window.innerHeight * dpr;
     this.canvas.style.width = window.innerWidth + 'px';
     this.canvas.style.height = window.innerHeight + 'px';
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform before scaling
     this.ctx.scale(dpr, dpr);
   }
 
@@ -185,7 +181,7 @@ class SpreadsheetRenderer {
     this.ctx.textAlign = "left";
   }
 
-  render(viewport, selectedCell, editingCell) {
+  render(viewport, selectedCells, editingCell) {
     const canvasWidth = window.innerWidth;
     const canvasHeight = window.innerHeight;
     const scrollLeft = viewport.scrollArea.scrollLeft;
@@ -193,17 +189,14 @@ class SpreadsheetRenderer {
     const visible = viewport.getVisibleCells();
 
     this.ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-
-    // Draw main grid
     this.drawMainGrid(visible, scrollLeft, scrollTop, editingCell);
 
-    // Draw selection
-    if (selectedCell) {
-      this.drawSelection(selectedCell, scrollLeft, scrollTop);
+    if (selectedCells && selectedCells.length > 0) {
+      for (const [sr, sc] of selectedCells) {
+        this.drawSelection([sr, sc], scrollLeft, scrollTop);
+      }
     }
-
-    // Draw headers (always on top)
-    this.drawHeaders(visible, scrollLeft, scrollTop, selectedCell);
+    this.drawHeaders(visible, scrollLeft, scrollTop, selectedCells && selectedCells[0]);
   }
 
   drawMainGrid(visible, scrollLeft, scrollTop, editingCell) {
@@ -233,16 +226,13 @@ class SpreadsheetRenderer {
   }
 
   drawCell(x, y, width, height, text, isEditing) {
-    // Fill background
-    this.ctx.fillStyle = isEditing ? SpreadsheetConfig.COLORS.CELL_BACKGROUND : SpreadsheetConfig.COLORS.CELL_BACKGROUND;
+    this.ctx.fillStyle = SpreadsheetConfig.COLORS.CELL_BACKGROUND;
     this.ctx.fillRect(x, y, width, height);
 
-    // Draw border
     this.ctx.strokeStyle = SpreadsheetConfig.COLORS.CELL_BORDER;
     this.ctx.lineWidth = 1;
     this.ctx.strokeRect(x, y, width, height);
 
-    // Draw text (only if not editing)
     if (!isEditing && text) {
       this.ctx.fillStyle = SpreadsheetConfig.COLORS.CELL_TEXT;
       this.ctx.fillText(text, x + 6, y + height / 2);
@@ -257,7 +247,6 @@ class SpreadsheetRenderer {
     const w = this.data.colWidths[sc];
     const h = this.data.rowHeights[sr];
 
-    // Only draw if within visible area
     if (y + h > SpreadsheetConfig.HEADER_HEIGHT && x + w > SpreadsheetConfig.HEADER_WIDTH &&
       x < window.innerWidth && y < window.innerHeight) {
       this.ctx.strokeStyle = SpreadsheetConfig.COLORS.SELECTION_BORDER;
@@ -277,7 +266,6 @@ class SpreadsheetRenderer {
     const { startCol, endCol } = visible;
     const canvasWidth = window.innerWidth;
 
-    // Background
     this.ctx.fillStyle = SpreadsheetConfig.COLORS.HEADER_BACKGROUND;
     this.ctx.fillRect(SpreadsheetConfig.HEADER_WIDTH, 0, canvasWidth - SpreadsheetConfig.HEADER_WIDTH, SpreadsheetConfig.HEADER_HEIGHT);
 
@@ -288,7 +276,6 @@ class SpreadsheetRenderer {
       const colW = this.data.colWidths[c];
       const x = xCursor - scrollLeft;
 
-      // Highlight selected column
       if (selectedCell && selectedCell[1] === c) {
         this.ctx.fillStyle = SpreadsheetConfig.COLORS.SELECTION_BACKGROUND;
         this.ctx.fillRect(x, 0, colW, SpreadsheetConfig.HEADER_HEIGHT);
@@ -310,7 +297,6 @@ class SpreadsheetRenderer {
     const { startRow, endRow } = visible;
     const canvasHeight = window.innerHeight;
 
-    // Background
     this.ctx.fillStyle = SpreadsheetConfig.COLORS.HEADER_BACKGROUND;
     this.ctx.fillRect(0, SpreadsheetConfig.HEADER_HEIGHT, SpreadsheetConfig.HEADER_WIDTH, canvasHeight - SpreadsheetConfig.HEADER_HEIGHT);
 
@@ -321,7 +307,6 @@ class SpreadsheetRenderer {
       const rowH = this.data.rowHeights[r];
       const y = yCursor - scrollTop;
 
-      // Highlight selected row
       if (selectedCell && selectedCell[0] === r) {
         this.ctx.fillStyle = SpreadsheetConfig.COLORS.SELECTION_BACKGROUND;
         this.ctx.fillRect(0, y, SpreadsheetConfig.HEADER_WIDTH, rowH);
@@ -352,14 +337,18 @@ class SpreadsheetRenderer {
   }
 }
 
-// Input manager for cell editing
 class InputManager {
   constructor(input, data) {
     this.input = input;
     this.data = data;
     this.selectedCell = null;
     this.isEditing = false;
+    this.navigationCallback = null;
     this.setupEventListeners();
+  }
+
+  setNavigationCallback(callback) {
+    this.navigationCallback = callback;
   }
 
   setupEventListeners() {
@@ -414,16 +403,18 @@ class InputManager {
       const value = this.input.value;
       for (const key of window.spreadsheet.selectedCells) {
         const [r, c] = key.split(',').map(Number);
-        this.data.setCellValue(r, c, value);
+        window.spreadsheet.setCellValue(r, c, value);
       }
     }
     this.input.style.display = "none";
     this.isEditing = false;
-    const cell = this.selectedCell;
-    this.selectedCell = null;
-    return cell;
+    setTimeout(() => {
+      this.selectedCell = null;
+    }, 0);
+    if (window.spreadsheet) {
+      window.spreadsheet.render();
+    }
   }
-
 
   updatePosition(scrollLeft, scrollTop) {
     if (this.selectedCell && this.isEditing) {
@@ -442,6 +433,30 @@ class InputManager {
         this.input.value = this.data.getCellValue(r, c);
       }
       this.hideInput();
+    } else if (
+      e.key === "ArrowUp" ||
+      e.key === "ArrowDown" ||
+      e.key === "ArrowLeft" ||
+      e.key === "ArrowRight"
+    ) {
+      e.preventDefault();
+      const currentCell = this.selectedCell;
+      if (this.isEditing) {
+        const value = this.input.value;
+        for (const key of window.spreadsheet.selectedCells) {
+          const [r, c] = key.split(',').map(Number);
+          window.spreadsheet.setCellValue(r, c, value);
+        }
+      }
+      this.input.style.display = "none";
+      this.isEditing = false;
+      setTimeout(() => {
+        this.selectedCell = null;
+      }, 0);
+
+      if (this.navigationCallback && currentCell) {
+        this.navigationCallback(e.key, currentCell);
+      }
     }
   }
 
@@ -463,12 +478,21 @@ class VirtualSpreadsheet {
     this.viewport = new ViewportManager(this.scrollArea, this.data);
     this.inputManager = new InputManager(this.input, this.data);
 
-    this.selectedCells = new Set(); // Changed from single selectedCell to multiple selection
-    this.lastSelectedCell = null; // Track last selected cell for shift selection
+    this.selectedCells = new Set();
+    this.lastSelectedCell = null;
     this.resizing = { col: -1, row: -1, startX: 0, startY: 0, origWidth: 0, origHeight: 0 };
 
     this.undoStack = [];
     this.redoStack = [];
+    this.ignoreNextClick = false;
+    this.didDrag = false;
+
+    this.renderRequested = false;
+    this.requestRender = this.requestRender.bind(this);
+
+    this.throttledInputUpdate = SpreadsheetUtils.throttle(() => {
+      this.inputManager.updatePosition(this.scrollArea.scrollLeft, this.scrollArea.scrollTop);
+    }, 16);
 
     this.setupEventListeners();
     this.updateScrollerSize();
@@ -476,12 +500,15 @@ class VirtualSpreadsheet {
   }
 
   setupEventListeners() {
-    // Throttled scroll handler for better performance
-    this.scrollArea.addEventListener("scroll", SpreadsheetUtils.throttle(() => {
+    this.inputManager.setNavigationCallback((key, currentCell) => {
+      this.handleNavigation(key, currentCell);
+    });
+
+    this.scrollArea.addEventListener("scroll", () => {
       this.viewport.updateViewport();
-      this.render();
-      this.inputManager.updatePosition(this.scrollArea.scrollLeft, this.scrollArea.scrollTop);
-    }, 16)); // ~60fps
+      this.requestRender();
+      this.throttledInputUpdate();
+    });
 
     this.scrollArea.addEventListener("mousedown", (e) => this.handleMouseDown(e));
     this.scrollArea.addEventListener("mousemove", (e) => this.handleMouseMove(e));
@@ -490,25 +517,60 @@ class VirtualSpreadsheet {
 
     window.addEventListener("resize", SpreadsheetUtils.debounce(() => {
       this.renderer.resize();
-      this.render();
+      this.requestRender();
     }, 100));
 
-    // Keyboard navigation and editing
     window.addEventListener("keydown", (e) => this.handleKeyDown(e));
 
-    // Undo/Redo buttons
     const undoBtn = document.getElementById("undoBtn");
     const redoBtn = document.getElementById("redoBtn");
     if (undoBtn) undoBtn.addEventListener("click", () => this.undo());
     if (redoBtn) redoBtn.addEventListener("click", () => this.redo());
   }
 
+  requestRender() {
+    if (this.renderRequested) return;
+    this.renderRequested = true;
+    requestAnimationFrame(() => {
+      this.render();
+      this.renderRequested = false;
+    });
+  }
+
+  handleNavigation(key, currentCell) {
+    if (!currentCell) return;
+
+    const [row, col] = currentCell;
+    let newRow = row;
+    let newCol = col;
+
+    switch (key) {
+      case "ArrowUp":
+        newRow = Math.max(0, row - 1);
+        break;
+      case "ArrowDown":
+        newRow = Math.min(this.data.rows - 1, row + 1);
+        break;
+      case "ArrowLeft":
+        newCol = Math.max(0, col - 1);
+        break;
+      case "ArrowRight":
+        newCol = Math.min(this.data.cols - 1, col + 1);
+        break;
+    }
+    this.selectedCells.clear();
+    this.selectedCells.add(`${newRow},${newCol}`);
+    this.lastSelectedCell = [newRow, newCol];
+    this.inputManager.showInput(this.lastSelectedCell, this.scrollArea.scrollLeft, this.scrollArea.scrollTop);
+    this.requestRender();
+  }
+
   handleMouseDown(e) {
     const rect = this.canvas.getBoundingClientRect();
     const clientX = e.clientX - rect.left;
     const clientY = e.clientY - rect.top;
+    this.didDrag = false;
 
-    // Check for column resize
     if (clientY < SpreadsheetConfig.HEADER_HEIGHT && clientX >= SpreadsheetConfig.HEADER_WIDTH) {
       const col = this.getResizeColumn(clientX);
       if (col >= 0) {
@@ -525,7 +587,6 @@ class VirtualSpreadsheet {
       }
     }
 
-    // Check for row resize
     if (clientX < SpreadsheetConfig.HEADER_WIDTH && clientY >= SpreadsheetConfig.HEADER_HEIGHT) {
       const row = this.getResizeRow(clientY);
       if (row >= 0) {
@@ -541,6 +602,20 @@ class VirtualSpreadsheet {
         return;
       }
     }
+
+    // Start cell selection
+    const col = this.getColumnAtX(clientX + this.scrollArea.scrollLeft);
+    const row = this.getRowAtY(clientY + this.scrollArea.scrollTop);
+    if (row >= 0 && col >= 0 && row < this.data.rows && col < this.data.cols) {
+      this.isSelecting = true;
+      this.selectionStartCell = [row, col];
+      this.selectedCells.clear();
+      this.selectedCells.add(`${row},${col}`);
+      this.lastSelectedCell = [row, col];
+      this.inputManager.hideInput();
+      this.requestRender();
+      e.preventDefault();
+    }
   }
 
   handleMouseMove(e) {
@@ -552,8 +627,8 @@ class VirtualSpreadsheet {
       const diff = clientX - this.resizing.startX;
       this.data.colWidths[this.resizing.col] = Math.max(SpreadsheetConfig.MIN_CELL_WIDTH, this.resizing.origWidth + diff);
       this.updateScrollerSize();
-      this.render();
-      this.inputManager.updatePosition(this.scrollArea.scrollLeft, this.scrollArea.scrollTop);
+      this.requestRender();
+      this.throttledInputUpdate();
       return;
     }
 
@@ -561,20 +636,43 @@ class VirtualSpreadsheet {
       const diff = clientY - this.resizing.startY;
       this.data.rowHeights[this.resizing.row] = Math.max(SpreadsheetConfig.MIN_CELL_HEIGHT, this.resizing.origHeight + diff);
       this.updateScrollerSize();
-      this.render();
-      this.inputManager.updatePosition(this.scrollArea.scrollLeft, this.scrollArea.scrollTop);
+      this.requestRender();
+      this.throttledInputUpdate();
+      return;
+    }
+    if (this.isSelecting && this.selectionStartCell) {
+      const col = this.getColumnAtX(clientX + this.scrollArea.scrollLeft);
+      const row = this.getRowAtY(clientY + this.scrollArea.scrollTop);
+      if (
+        row >= 0 && col >= 0 && row < this.data.rows && col < this.data.cols &&
+        (row !== this.lastSelectedCell[0] || col !== this.lastSelectedCell[1])
+      ) {
+        this.selectRange(this.selectionStartCell, [row, col]);
+        this.lastSelectedCell = [row, col];
+        this.requestRender();
+        this.didDrag = true;
+      }
       return;
     }
 
-    // Update cursor
     this.updateCursor(clientX, clientY);
   }
 
   handleMouseUp() {
     this.resizing = { col: -1, row: -1, startX: 0, startY: 0, origWidth: 0, origHeight: 0 };
+    if (this.isSelecting && this.didDrag) {
+      this.ignoreNextClick = true;
+    }
+    this.isSelecting = false;
+    this.selectionStartCell = null;
   }
 
   handleClick(e) {
+    if (this.ignoreNextClick) {
+      this.ignoreNextClick = false;
+      return;
+    }
+
     if (this.resizing.col >= 0 || this.resizing.row >= 0) return;
 
     const rect = this.canvas.getBoundingClientRect();
@@ -585,7 +683,7 @@ class VirtualSpreadsheet {
       this.inputManager.hideInput();
       this.selectedCells.clear();
       this.lastSelectedCell = null;
-      this.render();
+      this.requestRender();
       return;
     }
 
@@ -594,10 +692,8 @@ class VirtualSpreadsheet {
 
     if (row >= 0 && col >= 0 && row < this.data.rows && col < this.data.cols) {
       if (e.shiftKey && this.lastSelectedCell) {
-        // Multi-selection with shift key
         this.selectRange(this.lastSelectedCell, [row, col]);
       } else if (e.ctrlKey || e.metaKey) {
-        // Toggle selection with ctrl/cmd key
         const key = `${row},${col}`;
         if (this.selectedCells.has(key)) {
           this.selectedCells.delete(key);
@@ -606,18 +702,26 @@ class VirtualSpreadsheet {
         }
         this.lastSelectedCell = [row, col];
       } else {
-        // Single selection
         this.selectedCells.clear();
         this.selectedCells.add(`${row},${col}`);
         this.lastSelectedCell = [row, col];
       }
-      this.inputManager.showInput([row, col], this.scrollArea.scrollLeft, this.scrollArea.scrollTop);
-      this.render();
+      if (
+        this.selectedCells.size === 1 &&
+        !e.shiftKey &&
+        !e.ctrlKey &&
+        !e.metaKey
+      ) {
+        this.inputManager.showInput([row, col], this.scrollArea.scrollLeft, this.scrollArea.scrollTop);
+      } else {
+        this.inputManager.hideInput();
+      }
+      this.requestRender();
     } else {
       this.inputManager.hideInput();
       this.selectedCells.clear();
       this.lastSelectedCell = null;
-      this.render();
+      this.requestRender();
     }
   }
 
@@ -676,7 +780,8 @@ class VirtualSpreadsheet {
       if (this.getResizeColumn(clientX) >= 0) {
         this.scrollArea.style.cursor = "col-resize";
       }
-    } else if (clientX < SpreadsheetConfig.HEADER_WIDTH && clientY >= SpreadsheetConfig.HEADER_HEIGHT) {
+    }
+    else if (clientX < SpreadsheetConfig.HEADER_WIDTH && clientY >= SpreadsheetConfig.HEADER_HEIGHT) {
       if (this.getResizeRow(clientY) >= 0) {
         this.scrollArea.style.cursor = "row-resize";
       }
@@ -691,51 +796,77 @@ class VirtualSpreadsheet {
 
   render() {
     this.viewport.updateViewport();
-    // Pass multiple selected cells to renderer
-    this.renderer.render(this.viewport, this.selectedCells, this.inputManager.getEditingCell());
+    this.renderer.render(
+      this.viewport,
+      Array.from(this.selectedCells).map(key => key.split(',').map(Number)),
+      this.inputManager.getEditingCell()
+    );
   }
 
-  // Public API methods for extending functionality
   getCellValue(row, col) {
     return this.data.getCellValue(row, col);
   }
 
+  getSnapshot() {
+    return JSON.stringify({
+      data: this.data.data.map(row => [...row]),
+      colWidths: [...this.data.colWidths],
+      rowHeights: [...this.data.rowHeights]
+    });
+  }
+
+  restoreSnapshot(snapshot) {
+    const state = JSON.parse(snapshot);
+    this.data.data = state.data.map(row => [...row]);
+    this.data.colWidths = [...state.colWidths];
+    this.data.rowHeights = [...state.rowHeights];
+    this.updateScrollerSize();
+    this.requestRender();
+  }
+
+  pushUndo(clearRedo = true) {
+    this.undoStack.push(this.getSnapshot());
+    if (clearRedo) this.redoStack = [];
+  }
+
   setCellValue(row, col, value) {
-    this.pushUndo();
+    this.pushUndo(true);
     this.data.setCellValue(row, col, value);
-    this.render();
-  }
-
-  getSelectedCell() {
-    return this.selectedCell;
-  }
-
-  selectCell(row, col) {
-    if (row >= 0 && row < this.data.rows && col >= 0 && col < this.data.cols) {
-      this.selectedCell = [row, col];
-      this.inputManager.showInput(this.selectedCell, this.scrollArea.scrollLeft, this.scrollArea.scrollTop);
-      this.render();
-    }
+    this.requestRender();
   }
 
   addRow(index = this.data.rows) {
-    // Implementation for adding rows
+    this.pushUndo(true);
     this.data.rows++;
     this.data.data.splice(index, 0, Array(this.data.cols).fill(""));
     this.data.rowHeights.splice(index, 0, SpreadsheetConfig.DEFAULT_CELL_HEIGHT);
     this.updateScrollerSize();
-    this.render();
+    this.requestRender();
   }
 
   addColumn(index = this.data.cols) {
-    // Implementation for adding columns
+    this.pushUndo(true);
     this.data.cols++;
     this.data.colWidths.splice(index, 0, SpreadsheetConfig.DEFAULT_CELL_WIDTH);
     for (let row of this.data.data) {
       row.splice(index, 0, "");
     }
     this.updateScrollerSize();
-    this.render();
+    this.requestRender();
+  }
+
+  undo() {
+    if (this.undoStack.length === 0) return;
+    this.redoStack.push(this.getSnapshot());
+    const snapshot = this.undoStack.pop();
+    this.restoreSnapshot(snapshot);
+  }
+
+  redo() {
+    if (this.redoStack.length === 0) return;
+    this.undoStack.push(this.getSnapshot());
+    const snapshot = this.redoStack.pop();
+    this.restoreSnapshot(snapshot);
   }
 
   copySelection() {
@@ -757,7 +888,6 @@ class VirtualSpreadsheet {
     }
   }
 
-
   selectRange(start, end) {
     this.selectedCells.clear();
     const startRow = Math.min(start[0], end[0]);
@@ -769,28 +899,6 @@ class VirtualSpreadsheet {
         this.selectedCells.add(`${r},${c}`);
       }
     }
-  }
-
-  pushUndo() {
-    const snapshot = JSON.stringify(this.data.data);
-    this.undoStack.push(snapshot);
-    this.redoStack = [];
-  }
-
-  undo() {
-    if (this.undoStack.length === 0) return;
-    const snapshot = this.undoStack.pop();
-    this.redoStack.push(JSON.stringify(this.data.data));
-    this.data.data = JSON.parse(snapshot);
-    this.render();
-  }
-
-  redo() {
-    if (this.redoStack.length === 0) return;
-    const snapshot = this.redoStack.pop();
-    this.undoStack.push(JSON.stringify(this.data.data));
-    this.data.data = JSON.parse(snapshot);
-    this.render();
   }
 
   handleKeyDown(e) {
@@ -837,7 +945,7 @@ class VirtualSpreadsheet {
         this.inputManager.hideInput();
         this.selectedCells.clear();
         this.lastSelectedCell = null;
-        this.render();
+        this.requestRender();
         return;
       default:
         return;
@@ -848,23 +956,11 @@ class VirtualSpreadsheet {
     this.selectedCells.add(`${newRow},${newCol}`);
     this.lastSelectedCell = [newRow, newCol];
     this.inputManager.showInput(this.lastSelectedCell, this.scrollArea.scrollLeft, this.scrollArea.scrollTop);
-    this.render();
+    this.requestRender();
   }
 }
-
 
 document.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('container');
   window.spreadsheet = new VirtualSpreadsheet(container);
-
-  // Add some sample data for testing
-  window.spreadsheet.setCellValue(0, 0, "Name");
-  window.spreadsheet.setCellValue(0, 1, "Age");
-  window.spreadsheet.setCellValue(0, 2, "City");
-  window.spreadsheet.setCellValue(1, 0, "John Doe");
-  window.spreadsheet.setCellValue(1, 1, "25");
-  window.spreadsheet.setCellValue(1, 2, "New York");
-  window.spreadsheet.setCellValue(2, 0, "Jane Smith");
-  window.spreadsheet.setCellValue(2, 1, "30");
-  window.spreadsheet.setCellValue(2, 2, "Los Angeles");
 });
