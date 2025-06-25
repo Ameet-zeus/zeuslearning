@@ -1,0 +1,59 @@
+html,
+body {
+    font-family: Arial, sans-serif;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+#navbar {
+    height: 5vh;
+}
+
+#cell-input {
+    position: absolute;
+    z-index: 10;
+    font-size: 14px;
+    box-sizing: border-box;
+    border: 2px solid #137e43;
+    background: #fff;
+    display: none;
+    outline: none;
+}
+
+#container {
+    position: relative;
+    height: 95vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+#sheet-scroll {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    border: 1px solid #e0e0e0;
+}
+
+#sheet-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    background: #fff;
+    box-sizing: border-box;
+    border: none;
+    display: block;
+}
+
+#virtual-sheet {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 0;
+}
