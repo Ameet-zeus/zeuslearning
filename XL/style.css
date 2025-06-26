@@ -1,0 +1,51 @@
+* {
+  padding: 0;
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+html,
+body {
+  height: 100vh;
+  width: 100vw;
+}
+
+.wrapper {
+  height: 100vh;
+  width: 100vw;
+  overflow: scroll;
+  position: relative;
+}
+
+#spreadsheet-canvas {
+  display: block;
+  background-color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
+  /* image-rendering: pixelated;
+  image-rendering: crisp-edges; */
+  /* width: calc(100vw - 18px);
+  height: calc(100vh - 18px); */
+}
+
+#scroll-container {
+  width: 100000px;
+  height: 3000000px;
+  z-index: 0;
+}
+
+#cell-editor {
+  position: fixed;
+  display: none;
+  z-index: 1000;
+  outline: green solid 2px;
+  box-sizing: border-box;
+  padding: 4px;
+  border: none;
+  background: #fff;
+  font-size: 12px;
+  font-family: Arial, Helvetica, sans-serif;
+}
