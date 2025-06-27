@@ -10,28 +10,31 @@ export class Viewport {
     this.scrollY = 0;
     this.width = window.innerWidth - 18;
     this.height = window.innerHeight - 18;
-
-    this.setupScrollListener();
-    this.setupResizeListener();
+    this.dpr = window.devicePixelRatio || 1;
   }
 
-  setupScrollListener() {
+  resize(width, height) {
+    this.width = width;
+    this.height = height;
+  }
+
+  resizeCanvas(canvas, ctx) {
+    const dpr = window.devicePixelRatio || 1;
     const wrapper = document.getElementById('wrapper');
-    wrapper.addEventListener('scroll', () => {
-      this.scrollX = wrapper.scrollLeft;
-      this.scrollY = wrapper.scrollTop;
-    });
+    const displayWidth = wrapper.clientWidth;
+    const displayHeight = wrapper.clientHeight;
+
+    canvas.style.width = displayWidth + 'px';
+    canvas.style.height = displayHeight + 'px';
+
+    canvas.width = displayWidth * dpr;
+    canvas.height = displayHeight * dpr;
+    ctx.scale(dpr, dpr);
+
+    this.resize(displayWidth, displayHeight);
   }
 
-  setupResizeListener() {
-    window.addEventListener('resize', () => {
-      this.width = window.innerWidth - 18;
-      this.height = window.innerHeight - 18;
-      const canvas = document.getElementById('spreadsheet-canvas');
-      canvas.width = this.width * (window.devicePixelRatio || 1);
-      canvas.height = this.height * (window.devicePixelRatio || 1);
-      canvas.style.width = this.width + 'px';
-      canvas.style.height = this.height + 'px';
-    });
+  alignToPixel(coord) {
+    return Math.floor(coord * this.dpr) / this.dpr + 0.1;
   }
 }
