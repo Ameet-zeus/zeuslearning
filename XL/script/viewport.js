@@ -1,3 +1,5 @@
+import { CONFIG } from "./config.js";
+
 export class Viewport {
   /**
    * @param scrollX sets the offset that viewport has been scrolled by in x
@@ -36,5 +38,35 @@ export class Viewport {
 
   alignToPixel(coord) {
     return Math.floor(coord * this.dpr) / this.dpr + 0.1;
+  }
+
+  scrollCellIntoView(row, col, renderer) {
+    const rowHeaderWidth = renderer ? renderer.rowHeaderWidth : 40;
+    const cellLeft = col * CONFIG.cellWidth;
+    const cellRight = cellLeft + CONFIG.cellWidth;
+    const cellTop = row * CONFIG.cellHeight;
+    const cellBottom = cellTop + CONFIG.cellHeight;
+    const viewportLeft = this.scrollX;
+    const viewportRight = this.scrollX + this.width - rowHeaderWidth;
+    const viewportTop = this.scrollY;
+    const viewportBottom = this.scrollY + this.height - CONFIG.cellHeight;
+    const wrapper = document.getElementById("wrapper");
+
+    if (cellLeft < viewportLeft) {
+      this.scrollX = cellLeft;
+    } else if (cellRight > viewportRight) {
+      this.scrollX = cellRight - this.width + rowHeaderWidth;
+    }
+
+    if (cellTop < viewportTop) {
+      this.scrollY = cellTop;
+    } else if (cellBottom > viewportBottom) {
+      this.scrollY = cellBottom - this.height + CONFIG.cellHeight;
+    }
+
+    if (wrapper) {
+      wrapper.scrollLeft = this.scrollX;
+      wrapper.scrollTop = this.scrollY;
+    }
   }
 }

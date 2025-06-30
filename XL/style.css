@@ -24,7 +24,7 @@ body {
   top: 0;
   left: 0;
   z-index: 1;
-  pointer-events: none;
+  /* pointer-events: none; */
   /* image-rendering: pixelated;
   image-rendering: crisp-edges; */
   /* width: calc(100vw - 18px);
