@@ -1,5 +1,10 @@
 import { CONFIG } from "../config.js";
 
+/**
+ * @param colWidth to store col width in map
+ * @param cumulativeWidths to store cumulative widths
+ * @param isDirty to check whether cumulative widths is upto date
+ */
 export class ColManager {
   constructor() {
     this.colWidth = new Map();
@@ -7,6 +12,7 @@ export class ColManager {
     this.isDirty = true;
   }
 
+  //Set the value in map
   set(col, value) {
     const key = `R${col}`;
     if (value === "" || value == null) {
@@ -17,11 +23,13 @@ export class ColManager {
     this.isDirty = true;
   }
 
+  //Get value from map
   get(col) {
     const key = `R${col}`;
     return Math.max(this.colWidth.get(key) || CONFIG.cellWidth, 5);
   }
 
+  //Get cumulative widths
   getCumulativeWidths() {
     if (!this.isDirty && this.cumulativeWidths.length === CONFIG.numCols + 1) {
       return this.cumulativeWidths;

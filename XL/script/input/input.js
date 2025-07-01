@@ -1,5 +1,6 @@
 import { CONFIG } from "../config.js";
 
+
 export class InputManager {
   constructor(viewport, renderer, data, selectionManager) {
     this.data = data;
@@ -22,11 +23,13 @@ export class InputManager {
     }
   }
 
-  positionEditor(row, col) {
+    positionEditor(row, col) {
     const { scrollX, scrollY } = this.viewport;
     const rowHeaderWidth = this.renderer.rowHeaderWidth;
-    const x = col * CONFIG.cellWidth - scrollX + rowHeaderWidth;
-    const y = row * CONFIG.cellHeight - scrollY + CONFIG.cellHeight;
+    const cellWidth = this.renderer.colManager.get(col);
+    const cellHeight = this.renderer.rowManager.get(row);
+    const x = this.renderer.getColumnX(col, scrollX);
+    const y = this.renderer.getRowY(row, scrollY);
 
     if (y < CONFIG.cellHeight || x < rowHeaderWidth) {
       this.editor.style.display = "none";
@@ -35,8 +38,8 @@ export class InputManager {
 
     this.editor.style.left = `${x + 2}px`;
     this.editor.style.top = `${y + 2}px`;
-    this.editor.style.width = `${CONFIG.cellWidth - 4}px`;
-    this.editor.style.height = `${CONFIG.cellHeight - 4}px`;
+    this.editor.style.width = `${cellWidth - 4}px`;
+    this.editor.style.height = `${cellHeight - 4}px`;
   }
 
   showEditor(row, col, initialValue = null) {

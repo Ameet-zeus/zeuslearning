@@ -1,5 +1,5 @@
 import { CONFIG } from "../config.js";
-import { getColEdge, getRowEdge } from "../input/resize.js";
+import { ResizeHelper } from "../input/resize.js";
 
 export class KeyboardEvents {
   constructor(inputManager) {
@@ -125,29 +125,47 @@ export class KeyboardEvents {
       }
     });
   }
-
-
 }
 
+
 export class PointerEvents {
-  constructor(inputManager, viewport, renderer) {
+  constructor(inputManager, viewport, renderer, rowManager, colManager, canvas) {
     this.inputManager = inputManager;
     this.viewport = viewport;
     this.renderer = renderer;
+    this.rowManager = rowManager;
+    this.colManager = colManager;
+    this.canvas = canvas || document.getElementById("spreadsheet-canvas");
+    this.resizing = null;
+    this.resizeHelper = new ResizeHelper(renderer, viewport);
     this.attach();
   }
 
   attach() {
     const wrapper = document.getElementById("wrapper");
-    const canvas = document.getElementById("spreadsheet-canvas");
+    const canvas = this.canvas;
 
     wrapper.addEventListener("click", (e) => {
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
+      const colEdge = this.resizeHelper.getColEdge(x, y);
+      const rowEdge = this.resizeHelper.getRowEdge(x, y);
+      if (colEdge !== -1 || rowEdge !== -1) {
+        this.renderer.drawGrid(this.inputManager.selectionManager.getSelection());
+        return;
+      }
+
       const result = this.inputManager.getCellFromMouse(x, y);
 
-      this.inputManager.hideEditor();
+      if (this.inputManager.editor.style.display !== "none") {
+        const sel = this.inputManager.selectionManager.getSelection();
+        const val = this.inputManager.editor.value;
+        if (sel && sel.type === 'cell') {
+          this.inputManager.data.set(sel.row, sel.col, val);
+        }
+        this.inputManager.hideEditor();
+      }
 
       if (result.type === 'cell') {
         this.inputManager.selectionManager.selectCell(result.row, result.col, false);
@@ -171,6 +189,73 @@ export class PointerEvents {
 
       if (result.type === 'cell') {
         this.inputManager.selectCell(result.row, result.col, true);
+      }
+    });
+
+    canvas.addEventListener("pointerdown", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const col = this.resizeHelper.getColEdge(x, y);
+      const row = this.resizeHelper.getRowEdge(x, y);
+
+      if (col !== -1 && col >= 0) {
+        this.resizing = {
+          type: "col",
+          index: col,
+          start: this.colManager.get(col),
+          startPos: x
+        };
+        e.preventDefault();
+      } else if (row !== -1 && row >= 0) {
+        this.resizing = {
+          type: "row",
+          index: row,
+          start: this.rowManager.get(row),
+          startPos: y
+        };
+        e.preventDefault();
+      }
+    });
+
+    document.addEventListener("pointermove", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      if (this.resizing) {
+        if (this.resizing.type === "col") {
+          let newWidth = this.resizing.start + (x - this.resizing.startPos);
+          newWidth = Math.max(newWidth, 20);
+          this.colManager.set(this.resizing.index, newWidth);
+        } else if (this.resizing.type === "row") {
+          let newHeight = this.resizing.start + (y - this.resizing.startPos);
+          newHeight = Math.max(newHeight, 15);
+          this.rowManager.set(this.resizing.index, newHeight);
+        }
+        this.renderer.drawGrid(this.inputManager.selectionManager.getSelection());
+        e.preventDefault();
+        return;
+      }
+
+      const col = this.resizeHelper.getColEdge(x, y);
+      const row = this.resizeHelper.getRowEdge(x, y);
+
+      if (col !== -1) {
+        canvas.style.cursor = "col-resize";
+      } else if (row !== -1) {
+        canvas.style.cursor = "row-resize";
+      } else {
+        canvas.style.cursor = "default";
+      }
+    });
+
+
+    document.addEventListener("pointerup", (e) => {
+      if (this.resizing) {
+        this.resizing = null;
+        canvas.style.cursor = "default";
       }
     });
   }
@@ -201,6 +286,7 @@ export class ScrollEvents {
   }
 }
 
+
 export class ResizeEvents {
   constructor(inputManager, viewport, renderer, canvas, ctx) {
     this.inputManager = inputManager;
@@ -226,101 +312,11 @@ export class ResizeEvents {
   }
 }
 
-export class MouseEvents {
-  constructor(canvas, renderer, viewport, rowManager, colManager) {
-    this.canvas = canvas;
-    this.renderer = renderer;
-    this.viewport = viewport;
-    this.rowManager = rowManager;
-    this.colManager = colManager;
-    this.resizing = null;
-    this.attach();
-  }
-
-  attach() {
-    this.canvas.addEventListener("mousemove", (e) => {
-      if (this.resizing) return;
-
-      const rect = this.canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      const col = getColEdge(x, y, this.renderer, this.viewport);
-      const row = getRowEdge(x, y, this.renderer, this.viewport);
-
-      if (col !== -1) {
-        this.canvas.style.cursor = "col-resize";
-      } else if (row !== -1) {
-        this.canvas.style.cursor = "row-resize";
-      } else {
-        this.canvas.style.cursor = "default";
-      }
-    });
-
-    this.canvas.addEventListener("mousedown", (e) => {
-      const rect = this.canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      const col = getColEdge(x, y, this.renderer, this.viewport);
-      const row = getRowEdge(x, y, this.renderer, this.viewport);
-
-      if (col !== -1 && col >= 0) {
-        this.resizing = {
-          type: "col",
-          index: col,
-          start: this.colManager.get(col),
-          startPos: x
-        };
-        e.preventDefault();
-      } else if (row !== -1 && row >= 0) {
-        this.resizing = {
-          type: "row",
-          index: row,
-          start: this.rowManager.get(row),
-          startPos: y
-        };
-        e.preventDefault();
-      }
-    });
-
-    document.addEventListener("mousemove", (e) => {
-      if (!this.resizing) return;
-
-      const rect = this.canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      if (this.resizing.type === "col") {
-        let newWidth = this.resizing.start + (x - this.resizing.startPos);
-        newWidth = Math.max(newWidth, 20);
-        this.colManager.set(this.resizing.index, newWidth);
-        this.renderer.drawGrid(this.renderer.viewport.selectionManager?.getSelection());
-      } else if (this.resizing.type === "row") {
-        let newHeight = this.resizing.start + (y - this.resizing.startPos);
-        newHeight = Math.max(newHeight, 15);
-        this.rowManager.set(this.resizing.index, newHeight);
-        this.renderer.drawGrid(this.renderer.viewport.selectionManager?.getSelection());
-      }
-
-      e.preventDefault();
-    });
-
-    document.addEventListener("mouseup", (e) => {
-      if (this.resizing) {
-        this.resizing = null;
-        this.canvas.style.cursor = "default";
-      }
-    });
-  }
-}
-
 export class EventsManager {
   constructor(inputManager, viewport, renderer, canvas, ctx, rowManager, colManager) {
     this.keyboard = new KeyboardEvents(inputManager);
-    this.pointer = new PointerEvents(inputManager, viewport, renderer);
+    this.pointer = new PointerEvents(inputManager, viewport, renderer, rowManager, colManager, canvas);
     this.scroll = new ScrollEvents(inputManager, viewport, renderer);
     this.resize = new ResizeEvents(inputManager, viewport, renderer, canvas, ctx);
-    this.mouse = new MouseEvents(canvas, renderer, viewport, rowManager, colManager);
   }
 }

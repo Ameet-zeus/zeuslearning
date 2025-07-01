@@ -6,6 +6,7 @@ export class DataManager {
     this.data = new Map();
   }
 
+  //Set value in map
   set(row, col, value) {
     const key = `R${row}C${col}`;
     if (value === "" || value == null) {
@@ -15,6 +16,7 @@ export class DataManager {
     }
   }
 
+  //Get value from map
   get(row, col) {
     const key = `R${row}C${col}`;
     return this.data.get(key) || "";

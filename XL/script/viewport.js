@@ -15,11 +15,13 @@ export class Viewport {
     this.dpr = window.devicePixelRatio || 1;
   }
 
+  //getting the viewport dimensions on resize
   resize(width, height) {
     this.width = width;
     this.height = height;
   }
 
+  //resizing canvas on resize
   resizeCanvas(canvas, ctx) {
     const dpr = window.devicePixelRatio || 1;
     const wrapper = document.getElementById('wrapper');
@@ -36,10 +38,12 @@ export class Viewport {
     this.resize(displayWidth, displayHeight);
   }
 
+  //for adjusting to device pizel ratio
   alignToPixel(coord) {
-    return Math.floor(coord * this.dpr) / this.dpr + 0.1;
+    return Math.floor(coord * this.dpr) / this.dpr + 0.5;
   }
 
+  //scrolling input into view
   scrollCellIntoView(row, col, renderer) {
     const rowHeaderWidth = renderer ? renderer.rowHeaderWidth : 40;
     const cellLeft = col * CONFIG.cellWidth;

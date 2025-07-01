@@ -1,6 +1,16 @@
 import { CONFIG } from "./config.js";
 
+/**
+ * @param data to manage data
+ * @param ctx to manage canvas
+ * @param viewport access viewport methods
+ * @param rowManager manage row hieghts
+ * @param colManager manage col widths
+ * @param dpr manage for bigger device pixel ratio
+ * @param calculateHeaderWidth Calculate the header width
+ */
 export class Renderer {
+  /** */
   constructor(ctx, viewport, data, rowManager, colManager) {
     this.data = data;
     this.ctx = ctx;
@@ -11,6 +21,7 @@ export class Renderer {
     this.calculateHeaderWidth();
   }
 
+  //Calculate Row Header Width
   calculateHeaderWidth() {
     this.ctx.font = CONFIG.font;
     const text = CONFIG.numRows.toString();
@@ -18,6 +29,7 @@ export class Renderer {
     this.rowHeaderWidth = Math.ceil(width + CONFIG.padding * 2);
   }
 
+  //Binary search for efficient calculations of sum for visible range
   binarySearchOffset(offsets, value) {
     let low = 0, high = offsets.length - 1;
     while (low <= high) {
@@ -31,6 +43,7 @@ export class Renderer {
     return Math.max(0, low - 1);
   }
 
+  //Calculate values for visible range
   getVisibleRange() {
     const { scrollX, scrollY, width, height } = this.viewport;
 
@@ -47,7 +60,7 @@ export class Renderer {
   }
 
 
-  // Helper method to get X position for a column
+  //Helper method to get X position for a column
   getColumnX(col, scrollX) {
     let x = this.rowHeaderWidth - scrollX;
     for (let c = 0; c < col; c++) {
@@ -56,7 +69,7 @@ export class Renderer {
     return x;
   }
 
-  // Helper method to get Y position for a row
+  //Helper method to get Y position for a row
   getRowY(row, scrollY) {
     let y = CONFIG.cellHeight - scrollY;
     for (let r = 0; r < row; r++) {
@@ -65,6 +78,7 @@ export class Renderer {
     return y;
   }
 
+  //Drawing the excel sheet
   drawGrid(selected = null) {
     const { ctx } = this;
     const { width, height } = this.viewport;
@@ -85,6 +99,7 @@ export class Renderer {
     }
   }
 
+  //Highlighting selections
   drawSelectionHighlights(selected, startCol, endCol, startRow, endRow) {
     const { ctx, viewport, rowHeaderWidth } = this;
     const { width, height } = viewport;
@@ -99,6 +114,7 @@ export class Renderer {
     }
   }
 
+  //Drawing the gridlines
   drawGridLines(startCol, endCol, startRow, endRow) {
     const { ctx, viewport, rowHeaderWidth } = this;
     const { scrollX, scrollY, width, height } = viewport;
@@ -106,7 +122,7 @@ export class Renderer {
     ctx.strokeStyle = '#D4D4D4';
     ctx.lineWidth = 1;
 
-    // Vertical lines - draw from startCol to endCol+1
+    // Drawing vertical lines
     for (let col = startCol; col <= endCol + 1 && col <= CONFIG.numCols; col++) {
       const x = this.getColumnX(col, scrollX);
       const alignedX = viewport.alignToPixel(x);
@@ -119,7 +135,7 @@ export class Renderer {
       }
     }
 
-    // Horizontal lines - draw from startRow to endRow+1
+    // Drawing horizontal lines
     for (let row = startRow; row <= endRow + 1 && row <= CONFIG.numRows; row++) {
       const y = this.getRowY(row, scrollY);
       const alignedY = viewport.alignToPixel(y);
@@ -133,6 +149,7 @@ export class Renderer {
     }
   }
 
+  //Drawing the data inside
   drawCellContent(startCol, endCol, startRow, endRow) {
     const { ctx, viewport, rowHeaderWidth } = this;
     const { scrollX, scrollY } = viewport;
@@ -158,39 +175,36 @@ export class Renderer {
     }
   }
 
+  //Drawing the headers
   drawHeaders(startCol, endCol, startRow, endRow) {
     const { ctx, viewport, rowHeaderWidth } = this;
     const { scrollX, scrollY, width, height } = viewport;
 
-    // Header background
+    //Header background
     const headerBg = '#F2F2F2';
     ctx.fillStyle = headerBg;
     ctx.fillRect(rowHeaderWidth, 0, width - rowHeaderWidth, CONFIG.cellHeight);
     ctx.fillRect(0, CONFIG.cellHeight, rowHeaderWidth, height - CONFIG.cellHeight);
 
-    // Header borders
+    //Header borders
     ctx.strokeStyle = '#BEBEBE';
     ctx.lineWidth = 1;
-
-    // Top header border
     ctx.beginPath();
     ctx.moveTo(0, CONFIG.cellHeight);
     ctx.lineTo(width, CONFIG.cellHeight);
     ctx.stroke();
-
-    // Left header border
     ctx.beginPath();
     ctx.moveTo(rowHeaderWidth, 0);
     ctx.lineTo(rowHeaderWidth, height);
     ctx.stroke();
 
-    // Header text
+    //Header text
     ctx.fillStyle = '#000';
     ctx.font = CONFIG.headerFont;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    // Column headers
+    //Column headers
     for (let col = startCol; col <= endCol; col++) {
       const x = this.getColumnX(col, scrollX);
       const colWidth = this.colManager.get(col);
@@ -199,7 +213,7 @@ export class Renderer {
         const label = this.getColumnLabel(col);
         ctx.fillText(label, x + colWidth / 2, CONFIG.cellHeight / 2);
 
-        // Vertical separator
+        //Vertical separator
         const xSep = viewport.alignToPixel(x + colWidth);
         if (xSep <= width) {
           ctx.beginPath();
@@ -210,15 +224,16 @@ export class Renderer {
       }
     }
 
-    // Row headers
+    //Row headers
     for (let row = startRow; row <= endRow; row++) {
       const y = this.getRowY(row, scrollY);
       const rowHeight = this.rowManager.get(row);
 
       if (y + rowHeight > CONFIG.cellHeight && y < height) {
-        ctx.fillText(row + 1, rowHeaderWidth / 2, y + rowHeight / 2);
+        ctx.textAlign = "right";
+        ctx.fillText(row + 1, rowHeaderWidth - 5, y + rowHeight / 2);
 
-        // Horizontal separator
+        //Horizontal separator
         const ySep = viewport.alignToPixel(y + rowHeight);
         if (ySep <= height) {
           ctx.beginPath();
@@ -229,13 +244,14 @@ export class Renderer {
       }
     }
 
-    // Top-left corner
+    //Top-left corner
     ctx.fillStyle = headerBg;
     ctx.fillRect(0, 0, rowHeaderWidth, CONFIG.cellHeight);
     ctx.strokeStyle = '#BEBEBE';
     ctx.strokeRect(0, 0, rowHeaderWidth, CONFIG.cellHeight);
   }
 
+  //Toggle selection effects
   drawSelectionEffects(selected) {
     if (selected.type === 'cell') {
       this.drawCellSelection(selected);
@@ -251,6 +267,7 @@ export class Renderer {
     }
   }
 
+  //Cell selection
   drawCellSelection(selected) {
     const { ctx, viewport, rowHeaderWidth } = this;
     const { scrollX, scrollY } = viewport;
@@ -268,6 +285,7 @@ export class Renderer {
     ctx.restore();
   }
 
+  //Row selection
   drawRowSelection(selected) {
     const { ctx, viewport, rowHeaderWidth } = this;
     const { scrollY } = viewport;
@@ -286,6 +304,7 @@ export class Renderer {
     }
   }
 
+  //Column selection
   drawColumnSelection(selected) {
     const { ctx, viewport, rowHeaderWidth } = this;
     const { scrollX } = viewport;
@@ -305,6 +324,7 @@ export class Renderer {
     }
   }
 
+  //Draw column header highlight
   highlightColumnHeader(col, ctx, scrollX, rowHeaderWidth, viewport, colManager, drawText = true) {
     const lightGreen = 'rgba(198, 239, 206, 0.7)';
     const x = this.getColumnX(col, scrollX);
@@ -326,6 +346,7 @@ export class Renderer {
     }
   }
 
+  //Draw row header highlight
   highlightRowHeader(row, ctx, scrollY, rowHeaderWidth, viewport, rowManager, drawText = true) {
     const lightGreen = 'rgba(198, 239, 206, 0.7)';
     const y = this.getRowY(row, scrollY);
@@ -338,14 +359,15 @@ export class Renderer {
       if (drawText) {
         ctx.fillStyle = '#000';
         ctx.font = CONFIG.headerFont;
-        ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(row + 1, rowHeaderWidth / 2, y + rowHeight / 2);
+        ctx.textAlign = "right";
+        ctx.fillText(row + 1, rowHeaderWidth - 5, y + rowHeight / 2);
       }
       ctx.restore();
     }
   }
 
+  //Underlining for selected cell
   drawHeaderUnderline(selected) {
     const { ctx, viewport, rowHeaderWidth } = this;
     const { scrollX, scrollY } = viewport;
@@ -357,7 +379,7 @@ export class Renderer {
     ctx.strokeStyle = '#107C10';
     ctx.lineWidth = 2;
 
-    // Column header underline
+    //Column header underline
     const x = this.getColumnX(selected.col, scrollX);
     const colWidth = this.colManager.get(selected.col);
 
@@ -368,7 +390,7 @@ export class Renderer {
       ctx.stroke();
     }
 
-    // Row header underline
+    //Row header underline
     const y = this.getRowY(selected.row, scrollY);
     const rowHeight = this.rowManager.get(selected.row);
 
@@ -382,6 +404,7 @@ export class Renderer {
     ctx.restore();
   }
 
+  //Draw all column header underlines
   drawAllColumnHeaderUnderlines() {
     const { ctx, viewport, rowHeaderWidth } = this;
     const { scrollX, width } = viewport;
@@ -406,6 +429,7 @@ export class Renderer {
     ctx.restore();
   }
 
+  //Draw all row headers underlines
   drawAllRowHeaderUnderlines() {
     const { ctx, viewport, rowHeaderWidth } = this;
     const { scrollY, height } = viewport;
@@ -430,6 +454,7 @@ export class Renderer {
     ctx.restore();
   }
 
+  //For select all
   drawAllSelection() {
     const { ctx, rowHeaderWidth } = this;
 
@@ -440,6 +465,7 @@ export class Renderer {
     this.drawAllRowHeaderUnderlines();
   }
 
+  //Column label calculator
   getColumnLabel(index) {
     let label = "";
     while (index >= 0) {

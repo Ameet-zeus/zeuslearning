@@ -24,28 +24,6 @@ function init() {
   new EventsManager(inputManager, viewport, renderer, canvas, ctx, rowManager, colManager);
 
   renderer.drawGrid();
-
-  renderer.scale = 1;
-  const wrapper = document.getElementById('wrapper');
-  canvas.addEventListener('wheel', function (e) {
-    if (e.ctrlKey) {
-      e.preventDefault();
-      let newScale = renderer.scale - e.deltaY * 0.001;
-      newScale = Math.max(0.5, Math.min(2, newScale)); // Clamp between 0.5x and 2x
-      if (newScale !== renderer.scale) {
-        renderer.scale = newScale;
-        ctx.setTransform(renderer.scale, 0, 0, renderer.scale, 0, 0);
-        renderer.drawGrid();
-      }
-    } else if (e.shiftKey) {
-      wrapper.scrollLeft += e.deltaY;
-      e.preventDefault();
-    } else {
-      wrapper.scrollTop += e.deltaY;
-      wrapper.scrollLeft += e.deltaX;
-      e.preventDefault();
-    }
-  }, { passive: false });
 }
 
 init();
