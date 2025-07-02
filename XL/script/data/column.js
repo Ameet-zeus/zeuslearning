@@ -26,7 +26,7 @@ export class ColManager {
   //Get value from map
   get(col) {
     const key = `R${col}`;
-    return Math.max(this.colWidth.get(key) || CONFIG.cellWidth, 5);
+    return this.colWidth.get(key) || CONFIG.cellWidth;
   }
 
   //Get cumulative widths

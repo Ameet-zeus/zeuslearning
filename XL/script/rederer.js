@@ -1,3 +1,4 @@
+/*jslint es6 */
 import { CONFIG } from "./config.js";
 
 /**
@@ -10,7 +11,6 @@ import { CONFIG } from "./config.js";
  * @param calculateHeaderWidth Calculate the header width
  */
 export class Renderer {
-  /** */
   constructor(ctx, viewport, data, rowManager, colManager) {
     this.data = data;
     this.ctx = ctx;
@@ -59,23 +59,28 @@ export class Renderer {
     return { startRow, endRow, startCol, endCol };
   }
 
-
   //Helper method to get X position for a column
   getColumnX(col, scrollX) {
-    let x = this.rowHeaderWidth - scrollX;
-    for (let c = 0; c < col; c++) {
-      x += this.colManager.get(c);
-    }
-    return x;
+    const colOffsets = this.colManager.getCumulativeWidths();
+    return this.rowHeaderWidth + colOffsets[col] - scrollX;
   }
 
   //Helper method to get Y position for a row
   getRowY(row, scrollY) {
-    let y = CONFIG.cellHeight - scrollY;
-    for (let r = 0; r < row; r++) {
-      y += this.rowManager.get(r);
-    }
-    return y;
+    const rowOffsets = this.rowManager.getCumulativeHeights();
+    return CONFIG.cellHeight + rowOffsets[row] - scrollY;
+  }
+
+  //Helper method to get column width
+  getColumnWidth(col) {
+    const colOffsets = this.colManager.getCumulativeWidths();
+    return colOffsets[col + 1] - colOffsets[col];
+  }
+
+  //Helper method to get row height
+  getRowHeight(row) {
+    const rowOffsets = this.rowManager.getCumulativeHeights();
+    return rowOffsets[row + 1] - rowOffsets[row];
   }
 
   //Drawing the excel sheet
@@ -86,7 +91,7 @@ export class Renderer {
 
     ctx.clearRect(0, 0, width, height);
 
-    if (selected && selected.type !== 'cell') {
+    if (selected) {
       this.drawSelectionHighlights(selected, startCol, endCol, startRow, endRow);
     }
 
@@ -94,6 +99,40 @@ export class Renderer {
     this.drawCellContent(startCol, endCol, startRow, endRow);
     this.drawHeaders(startCol, endCol, startRow, endRow);
 
+    if (selected && selected.type === 'range') {
+      const { viewport, rowHeaderWidth } = this;
+      const { scrollX, scrollY } = viewport;
+      const lightGreen = 'rgba(198, 239, 206, 0.6)';
+      ctx.save();
+      for (let col = selected.startCol; col <= selected.endCol; col++) {
+        const x = this.getColumnX(col, scrollX);
+        const colWidth = this.getColumnWidth(col);
+        if (x + colWidth > rowHeaderWidth && x < width) {
+          ctx.fillStyle = lightGreen;
+          ctx.fillRect(x, 0, colWidth, CONFIG.cellHeight);
+          ctx.fillStyle = '#000';
+          ctx.font = CONFIG.headerFont;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          const label = this.getColumnLabel(col);
+          ctx.fillText(label, x + colWidth / 2, CONFIG.cellHeight / 2);
+        }
+      }
+      for (let row = selected.startRow; row <= selected.endRow; row++) {
+        const y = this.getRowY(row, scrollY);
+        const rowHeight = this.getRowHeight(row);
+        if (y + rowHeight > CONFIG.cellHeight && y < height) {
+          ctx.fillStyle = lightGreen;
+          ctx.fillRect(0, y, rowHeaderWidth, rowHeight);
+          ctx.fillStyle = '#000';
+          ctx.font = CONFIG.headerFont;
+          ctx.textAlign = "right";
+          ctx.textBaseline = "middle";
+          ctx.fillText(row + 1, rowHeaderWidth - 5, y + rowHeight / 2);
+        }
+      }
+      ctx.restore();
+    }
     if (selected) {
       this.drawSelectionEffects(selected);
     }
@@ -102,15 +141,49 @@ export class Renderer {
   //Highlighting selections
   drawSelectionHighlights(selected, startCol, endCol, startRow, endRow) {
     const { ctx, viewport, rowHeaderWidth } = this;
-    const { width, height } = viewport;
+    const { width, height, scrollX, scrollY } = viewport;
 
     if (!selected) return;
 
     const lightGreen = 'rgba(198, 239, 206, 0.7)';
+    ctx.fillStyle = lightGreen;
 
     if (selected.type === 'all') {
-      ctx.fillStyle = lightGreen;
       ctx.fillRect(rowHeaderWidth, CONFIG.cellHeight, width - rowHeaderWidth, height - CONFIG.cellHeight);
+    } else if (selected.type === 'row') {
+      const y = this.getRowY(selected.row, scrollY);
+      const rowHeight = this.getRowHeight(selected.row);
+      if (y + rowHeight > CONFIG.cellHeight && y < height) {
+        ctx.fillRect(rowHeaderWidth, y, width - rowHeaderWidth, rowHeight);
+      }
+    } else if (selected.type === 'rows') {
+      for (let row = selected.start; row <= selected.end; row++) {
+        const y = this.getRowY(row, scrollY);
+        const rowHeight = this.getRowHeight(row);
+        if (y + rowHeight > CONFIG.cellHeight && y < height) {
+          ctx.fillRect(rowHeaderWidth, y, width - rowHeaderWidth, rowHeight);
+        }
+      }
+    } else if (selected.type === 'column') {
+      const x = this.getColumnX(selected.col, scrollX);
+      const colWidth = this.getColumnWidth(selected.col);
+      if (x + colWidth > rowHeaderWidth && x < width) {
+        ctx.fillRect(x, CONFIG.cellHeight, colWidth, height - CONFIG.cellHeight);
+      }
+    } else if (selected.type === 'columns') {
+      for (let col = selected.start; col <= selected.end; col++) {
+        const x = this.getColumnX(col, scrollX);
+        const colWidth = this.getColumnWidth(col);
+        if (x + colWidth > rowHeaderWidth && x < width) {
+          ctx.fillRect(x, CONFIG.cellHeight, colWidth, height - CONFIG.cellHeight);
+        }
+      }
+    } else if (selected.type === 'range') {
+      const x1 = this.getColumnX(selected.startCol, scrollX);
+      const y1 = this.getRowY(selected.startRow, scrollY);
+      const x2 = this.getColumnX(selected.endCol, scrollX) + this.getColumnWidth(selected.endCol);
+      const y2 = this.getRowY(selected.endRow, scrollY) + this.getRowHeight(selected.endRow);
+      ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
     }
   }
 
@@ -161,11 +234,11 @@ export class Renderer {
 
     for (let row = startRow; row <= endRow; row++) {
       const y = this.getRowY(row, scrollY);
-      const rowHeight = this.rowManager.get(row);
+      const rowHeight = this.getRowHeight(row);
 
       for (let col = startCol; col <= endCol; col++) {
         const x = this.getColumnX(col, scrollX);
-        const colWidth = this.colManager.get(col);
+        const colWidth = this.getColumnWidth(col);
         const val = this.data?.get(row, col);
 
         if (val && x + colWidth > rowHeaderWidth && x < viewport.width) {
@@ -207,7 +280,7 @@ export class Renderer {
     //Column headers
     for (let col = startCol; col <= endCol; col++) {
       const x = this.getColumnX(col, scrollX);
-      const colWidth = this.colManager.get(col);
+      const colWidth = this.getColumnWidth(col);
 
       if (x + colWidth > rowHeaderWidth && x < width) {
         const label = this.getColumnLabel(col);
@@ -227,7 +300,7 @@ export class Renderer {
     //Row headers
     for (let row = startRow; row <= endRow; row++) {
       const y = this.getRowY(row, scrollY);
-      const rowHeight = this.rowManager.get(row);
+      const rowHeight = this.getRowHeight(row);
 
       if (y + rowHeight > CONFIG.cellHeight && y < height) {
         ctx.textAlign = "right";
@@ -253,30 +326,176 @@ export class Renderer {
 
   //Toggle selection effects
   drawSelectionEffects(selected) {
+    if (!selected) return;
+
     if (selected.type === 'cell') {
       this.drawCellSelection(selected);
       this.drawHeaderUnderline(selected);
     } else if (selected.type === 'row') {
       this.drawRowSelection(selected);
+      this.drawRowBounding(selected);
       this.drawAllColumnHeaderUnderlines();
     } else if (selected.type === 'column') {
       this.drawColumnSelection(selected);
+      this.drawColumnBounding(selected);
       this.drawAllRowHeaderUnderlines();
+    } else if (selected.type === 'rows') {
+      this.drawMultiRowSelection(selected);
+      this.drawAllColumnHeaderUnderlines();
+    } else if (selected.type === 'columns') {
+      this.drawMultiColumnSelection(selected);
+      this.drawAllRowHeaderUnderlines();
+    } else if (selected.type === 'range') {
+      this.drawRangeSelection(selected);
+      this.drawRangeHeaderUnderlines(selected);
     } else if (selected.type === 'all') {
       this.drawAllSelection();
     }
   }
 
+  // Single row bounding box
+  drawRowBounding(selected) {
+    const { ctx, viewport } = this;
+    const { scrollY } = viewport;
+    const { row } = selected;
+
+    const y = this.getRowY(row, scrollY);
+    const rowHeight = this.getRowHeight(row);
+
+    if (y + rowHeight > CONFIG.cellHeight && y < viewport.height) {
+      ctx.save();
+      ctx.strokeStyle = '#107C10';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(0, y, viewport.width, rowHeight);
+      ctx.restore();
+    }
+  }
+
+  // Single column bounding box
+  drawColumnBounding(selected) {
+    const { ctx, viewport } = this;
+    const { scrollX } = viewport;
+    const { col } = selected;
+
+    const x = this.getColumnX(col, scrollX);
+    const colWidth = this.getColumnWidth(col);
+
+    if (x + colWidth > this.rowHeaderWidth && x < viewport.width) {
+      ctx.save();
+      ctx.strokeStyle = '#107C10';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x, 0, colWidth, viewport.height);
+      ctx.restore();
+    }
+  }
+
+  // Multi-row selection
+  drawMultiRowSelection(selected) {
+    const { ctx, viewport } = this;
+    const { scrollY } = viewport;
+
+    // Draw individual row selections
+    for (let row = selected.start; row <= selected.end; row++) {
+      this.drawRowSelection({ row });
+    }
+
+    // Draw bounding box around all selected rows
+    const y1 = this.getRowY(selected.start, scrollY);
+    const y2 = this.getRowY(selected.end, scrollY) + this.getRowHeight(selected.end);
+
+    ctx.save();
+    ctx.strokeStyle = '#107C10';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(0, y1, viewport.width, y2 - y1);
+    ctx.restore();
+  }
+
+  // Multi-column selection
+  drawMultiColumnSelection(selected) {
+    const { ctx, viewport } = this;
+    const { scrollX } = viewport;
+
+    // Draw individual column selections
+    for (let col = selected.start; col <= selected.end; col++) {
+      this.drawColumnSelection({ col });
+    }
+
+    // Draw bounding box around all selected columns
+    const x1 = this.getColumnX(selected.start, scrollX);
+    const x2 = this.getColumnX(selected.end, scrollX) + this.getColumnWidth(selected.end);
+
+    ctx.save();
+    ctx.strokeStyle = '#107C10';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x1, 0, x2 - x1, viewport.height);
+    ctx.restore();
+  }
+
+  // Range selection (cell drag)
+  drawRangeSelection(selected) {
+    const { ctx, viewport } = this;
+    const { scrollX, scrollY } = viewport;
+    const x1 = this.getColumnX(selected.startCol, scrollX);
+    const y1 = this.getRowY(selected.startRow, scrollY);
+    const x2 = this.getColumnX(selected.endCol, scrollX) + this.getColumnWidth(selected.endCol);
+    const y2 = this.getRowY(selected.endRow, scrollY) + this.getRowHeight(selected.endRow);
+
+    // Dark green outline
+    ctx.save();
+    ctx.strokeStyle = '#107C10';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+    ctx.restore();
+  }
+
+  // Header underlines for range selection
+  drawRangeHeaderUnderlines(selected) {
+    const { ctx, viewport, rowHeaderWidth } = this;
+    const { scrollX, scrollY, width, height } = viewport;
+
+    ctx.save();
+    ctx.strokeStyle = '#107C10';
+    ctx.lineWidth = 2;
+
+    // Column header underlines
+    for (let col = selected.startCol; col <= selected.endCol; col++) {
+      const x = this.getColumnX(col, scrollX);
+      const colWidth = this.getColumnWidth(col);
+
+      if (x + colWidth > rowHeaderWidth && x < width) {
+        ctx.beginPath();
+        ctx.moveTo(x, CONFIG.cellHeight - 2);
+        ctx.lineTo(x + colWidth, CONFIG.cellHeight - 2);
+        ctx.stroke();
+      }
+    }
+
+    // Row header underlines
+    for (let row = selected.startRow; row <= selected.endRow; row++) {
+      const y = this.getRowY(row, scrollY);
+      const rowHeight = this.getRowHeight(row);
+
+      if (y + rowHeight > CONFIG.cellHeight && y < height) {
+        ctx.beginPath();
+        ctx.moveTo(rowHeaderWidth - 2, y);
+        ctx.lineTo(rowHeaderWidth - 2, y + rowHeight);
+        ctx.stroke();
+      }
+    }
+
+    ctx.restore();
+  }
+
   //Cell selection
   drawCellSelection(selected) {
-    const { ctx, viewport, rowHeaderWidth } = this;
+    const { ctx, viewport } = this;
     const { scrollX, scrollY } = viewport;
     const { row, col } = selected;
 
     const x = this.getColumnX(col, scrollX);
     const y = this.getRowY(row, scrollY);
-    const cellWidth = this.colManager.get(col);
-    const cellHeight = this.rowManager.get(row);
+    const cellWidth = this.getColumnWidth(col);
+    const cellHeight = this.getRowHeight(row);
 
     ctx.save();
     ctx.strokeStyle = '#107C10';
@@ -291,16 +510,16 @@ export class Renderer {
     const { scrollY } = viewport;
 
     const y = this.getRowY(selected.row, scrollY);
-    const rowHeight = this.rowManager.get(selected.row);
+    const rowHeight = this.getRowHeight(selected.row);
 
     if (y + rowHeight > CONFIG.cellHeight && y < viewport.height) {
       ctx.fillStyle = '#107C10';
       ctx.fillRect(0, y, rowHeaderWidth, rowHeight);
       ctx.fillStyle = '#FFF';
       ctx.font = 'bold ' + CONFIG.headerFont;
-      ctx.textAlign = "center";
+      ctx.textAlign = "right";
+      ctx.fillText(selected.row + 1, rowHeaderWidth - 5, y + rowHeight / 2);
       ctx.textBaseline = "middle";
-      ctx.fillText(selected.row + 1, rowHeaderWidth / 2, y + rowHeight / 2);
     }
   }
 
@@ -310,7 +529,7 @@ export class Renderer {
     const { scrollX } = viewport;
 
     const x = this.getColumnX(selected.col, scrollX);
-    const colWidth = this.colManager.get(selected.col);
+    const colWidth = this.getColumnWidth(selected.col);
 
     if (x + colWidth > rowHeaderWidth && x < viewport.width) {
       ctx.fillStyle = '#107C10';
@@ -328,7 +547,7 @@ export class Renderer {
   highlightColumnHeader(col, ctx, scrollX, rowHeaderWidth, viewport, colManager, drawText = true) {
     const lightGreen = 'rgba(198, 239, 206, 0.7)';
     const x = this.getColumnX(col, scrollX);
-    const colWidth = colManager.get(col);
+    const colWidth = this.getColumnWidth(col);
     if (x + colWidth > rowHeaderWidth && x < viewport.width) {
       ctx.save();
       ctx.fillStyle = lightGreen;
@@ -350,7 +569,7 @@ export class Renderer {
   highlightRowHeader(row, ctx, scrollY, rowHeaderWidth, viewport, rowManager, drawText = true) {
     const lightGreen = 'rgba(198, 239, 206, 0.7)';
     const y = this.getRowY(row, scrollY);
-    const rowHeight = rowManager.get(row);
+    const rowHeight = this.getRowHeight(row);
     if (y + rowHeight > CONFIG.cellHeight && y < viewport.height) {
       ctx.save();
       ctx.fillStyle = lightGreen;
@@ -381,7 +600,7 @@ export class Renderer {
 
     //Column header underline
     const x = this.getColumnX(selected.col, scrollX);
-    const colWidth = this.colManager.get(selected.col);
+    const colWidth = this.getColumnWidth(selected.col);
 
     if (x + colWidth > rowHeaderWidth && x < viewport.width) {
       ctx.beginPath();
@@ -392,7 +611,7 @@ export class Renderer {
 
     //Row header underline
     const y = this.getRowY(selected.row, scrollY);
-    const rowHeight = this.rowManager.get(selected.row);
+    const rowHeight = this.getRowHeight(selected.row);
 
     if (y + rowHeight > CONFIG.cellHeight && y < viewport.height) {
       ctx.beginPath();
@@ -417,7 +636,7 @@ export class Renderer {
     for (let col = startCol; col <= endCol; col++) {
       this.highlightColumnHeader(col, ctx, scrollX, rowHeaderWidth, viewport, this.colManager);
       const x = this.getColumnX(col, scrollX);
-      const colWidth = this.colManager.get(col);
+      const colWidth = this.getColumnWidth(col);
 
       if (x + colWidth > rowHeaderWidth && x < width) {
         ctx.beginPath();
@@ -442,7 +661,7 @@ export class Renderer {
     for (let row = startRow; row <= endRow; row++) {
       this.highlightRowHeader(row, ctx, scrollY, rowHeaderWidth, viewport, this.rowManager);
       const y = this.getRowY(row, scrollY);
-      const rowHeight = this.rowManager.get(row);
+      const rowHeight = this.getRowHeight(row);
 
       if (y + rowHeight > CONFIG.cellHeight && y < height) {
         ctx.beginPath();

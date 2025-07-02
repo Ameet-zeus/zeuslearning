@@ -110,7 +110,6 @@ export class KeyboardEvents {
             this.inputManager.showEditor(row, col);
             return;
           default:
-            // Handle single character input
             if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
               this.inputManager.showEditor(row, col, e.key);
               e.preventDefault();
@@ -127,7 +126,6 @@ export class KeyboardEvents {
   }
 }
 
-
 export class PointerEvents {
   constructor(inputManager, viewport, renderer, rowManager, colManager, canvas) {
     this.inputManager = inputManager;
@@ -137,6 +135,7 @@ export class PointerEvents {
     this.colManager = colManager;
     this.canvas = canvas || document.getElementById("spreadsheet-canvas");
     this.resizing = null;
+    this.dragging = null;
     this.resizeHelper = new ResizeHelper(renderer, viewport);
     this.attach();
   }
@@ -146,11 +145,14 @@ export class PointerEvents {
     const canvas = this.canvas;
 
     wrapper.addEventListener("click", (e) => {
+      if (this.dragging) return;
+
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
       const colEdge = this.resizeHelper.getColEdge(x, y);
       const rowEdge = this.resizeHelper.getRowEdge(x, y);
+
       if (colEdge !== -1 || rowEdge !== -1) {
         this.renderer.drawGrid(this.inputManager.selectionManager.getSelection());
         return;
@@ -208,6 +210,7 @@ export class PointerEvents {
           startPos: x
         };
         e.preventDefault();
+        return;
       } else if (row !== -1 && row >= 0) {
         this.resizing = {
           type: "row",
@@ -215,6 +218,22 @@ export class PointerEvents {
           start: this.rowManager.get(row),
           startPos: y
         };
+        e.preventDefault();
+        return;
+      }
+
+      const result = this.inputManager.getCellFromMouse(x, y);
+      if (result) {
+        this.dragging = {
+          startType: result.type,
+          startRow: result.row,
+          startCol: result.col,
+          currentRow: result.row,
+          currentCol: result.col,
+          hasMoved: false
+        };
+
+        canvas.setPointerCapture(e.pointerId);
         e.preventDefault();
       }
     });
@@ -239,6 +258,41 @@ export class PointerEvents {
         return;
       }
 
+      if (this.dragging) {
+        const result = this.inputManager.getCellFromMouse(x, y);
+        if (result) {
+          if (
+            result.row !== this.dragging.startRow ||
+            result.col !== this.dragging.startCol
+          ) {
+            this.dragging.hasMoved = true;
+          }
+          this.dragging.currentRow = result.row;
+          this.dragging.currentCol = result.col;
+          this.dragging.currentRow = result.row;
+          this.dragging.currentCol = result.col;
+
+          if (this.dragging.startType === 'cell' && result.type === 'cell') {
+            this.inputManager.selectionManager.selectCellRange(
+              this.dragging.startRow,
+              this.dragging.startCol,
+              result.row,
+              result.col
+            );
+          } else if (this.dragging.startType === 'row' &&
+            (result.type === 'row' || result.type === 'cell')) {
+            const endRow = result.type === 'row' ? result.row : result.row;
+            this.inputManager.selectionManager.selectRow(this.dragging.startRow, endRow);
+          } else if (this.dragging.startType === 'column' &&
+            (result.type === 'column' || result.type === 'cell')) {
+            const endCol = result.type === 'column' ? result.col : result.col;
+            this.inputManager.selectionManager.selectColumn(this.dragging.startCol, endCol);
+          }
+        }
+        e.preventDefault();
+        return;
+      }
+
       const col = this.resizeHelper.getColEdge(x, y);
       const row = this.resizeHelper.getRowEdge(x, y);
 
@@ -251,13 +305,64 @@ export class PointerEvents {
       }
     });
 
-
     document.addEventListener("pointerup", (e) => {
       if (this.resizing) {
         this.resizing = null;
         canvas.style.cursor = "default";
+        return;
+      }
+
+      if (this.dragging) {
+        const wasDrag = this.dragging.hasMoved;
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const colEdge = this.resizeHelper.getColEdge(x, y);
+        const rowEdge = this.resizeHelper.getRowEdge(x, y);
+
+        this.dragging = null;
+        canvas.style.cursor = "default";
+
+        if (!wasDrag && colEdge === -1 && rowEdge === -1) {
+          const result = this.inputManager.getCellFromMouse(x, y);
+
+          if (this.inputManager.editor.style.display !== "none") {
+            const sel = this.inputManager.selectionManager.getSelection();
+            const val = this.inputManager.editor.value;
+            if (sel && sel.type === 'cell') {
+              this.inputManager.data.set(sel.row, sel.col, val);
+            }
+            this.inputManager.hideEditor();
+          }
+
+          if (result && result.type === 'cell') {
+            this.inputManager.selectionManager.selectCell(result.row, result.col, false);
+          } else if (result && result.type === 'row') {
+            this.inputManager.selectionManager.selectRow(result.row);
+          } else if (result && result.type === 'column') {
+            this.inputManager.selectionManager.selectColumn(result.col);
+          } else if (result && result.type === 'corner') {
+            this.inputManager.selectionManager.selectAll();
+          } else {
+            this.inputManager.selectionManager.clearSelection();
+          }
+
+          this.renderer.drawGrid(this.inputManager.selectionManager.getSelection());
+        }
       }
     });
+
+    canvas.addEventListener('wheel', (e) => {
+      const wrapper = document.getElementById('wrapper');
+      let deltaX = e.deltaX;
+      let deltaY = e.deltaY;
+      if (e.shiftKey && deltaX === 0 && deltaY !== 0) {
+        deltaX = deltaY;
+        deltaY = 0;
+      }
+      wrapper.scrollTop += deltaY;
+      wrapper.scrollLeft += deltaX;
+    }, { passive: false });
   }
 }
 

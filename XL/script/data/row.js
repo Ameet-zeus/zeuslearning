@@ -26,7 +26,7 @@ export class RowManager {
   //Get value from map
   get(row) {
     const key = `R${row}`;
-    return Math.max(this.rowHeight.get(key) || CONFIG.cellHeight, 5);
+    return this.rowHeight.get(key) || CONFIG.cellHeight;
   }
 
   //Get cumulative heights

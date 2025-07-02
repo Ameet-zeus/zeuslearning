@@ -1,4 +1,3 @@
-
 import { CONFIG } from "../config.js";
 
 export class SelectionManager {
@@ -16,12 +15,10 @@ export class SelectionManager {
     const { scrollX, scrollY } = this.viewport;
     const rowHeaderWidth = this.renderer.rowHeaderWidth;
 
-    // Select all
     if (x < rowHeaderWidth && y < CONFIG.cellHeight) {
       return { type: 'corner' };
     }
 
-    // Column header
     if (y < CONFIG.cellHeight && x >= rowHeaderWidth) {
       let accX = rowHeaderWidth - scrollX;
       for (let col = 0; col < CONFIG.numCols; col++) {
@@ -33,7 +30,6 @@ export class SelectionManager {
       }
     }
 
-    // Row header
     if (x < rowHeaderWidth && y >= CONFIG.cellHeight) {
       let accY = CONFIG.cellHeight - scrollY;
       for (let row = 0; row < CONFIG.numRows; row++) {
@@ -45,7 +41,6 @@ export class SelectionManager {
       }
     }
 
-    // Cell
     if (x >= rowHeaderWidth && y >= CONFIG.cellHeight) {
       let accY = CONFIG.cellHeight - scrollY;
       for (let row = 0; row < CONFIG.numRows; row++) {
@@ -63,8 +58,10 @@ export class SelectionManager {
         accY += h;
       }
     }
-
     return null;
+  }
+  applySelectionVisuals() {
+    this.renderer.drawGrid(this.selected);
   }
 
   //Update on selecting cell
@@ -73,27 +70,64 @@ export class SelectionManager {
       row >= CONFIG.numRows || col >= CONFIG.numCols) {
       return;
     }
-
     this.selected = { type: 'cell', row, col };
     this.isEditing = edit;
-    this.renderer.drawGrid(this.selected);
+    this.applySelectionVisuals();
     if (!edit && this.editor) {
       this.editor.blur();
     }
   }
 
   //Update page on selecting row
-  selectRow(row) {
-    this.selected = { type: 'row', row };
+  selectRow(row, endRow = null) {
+    if (row < 0 || row >= CONFIG.numRows) return;
+    if (endRow !== null && (endRow < 0 || endRow >= CONFIG.numRows)) return;
+    if (endRow !== null && endRow !== row) {
+      this.selected = {
+        type: 'rows',
+        start: Math.min(row, endRow),
+        end: Math.max(row, endRow)
+      };
+    } else {
+      this.selected = { type: 'row', row };
+    }
     this.isEditing = false;
-    this.renderer.drawGrid(this.selected);
+    this.applySelectionVisuals();
   }
 
   //Update page on selecting column
-  selectColumn(col) {
-    this.selected = { type: 'column', col };
+  selectColumn(col, endCol = null) {
+    if (col < 0 || col >= CONFIG.numCols) return;
+    if (endCol !== null && (endCol < 0 || endCol >= CONFIG.numCols)) return;
+    if (endCol !== null && endCol !== col) {
+      this.selected = {
+        type: 'columns',
+        start: Math.min(col, endCol),
+        end: Math.max(col, endCol)
+      };
+    } else {
+      this.selected = { type: 'column', col };
+    }
     this.isEditing = false;
-    this.renderer.drawGrid(this.selected);
+    this.applySelectionVisuals();
+  }
+
+  // Cell range selection
+  selectCellRange(startRow, startCol, endRow, endCol) {
+    startRow = Math.max(0, Math.min(startRow, CONFIG.numRows - 1));
+    endRow = Math.max(0, Math.min(endRow, CONFIG.numRows - 1));
+    startCol = Math.max(0, Math.min(startCol, CONFIG.numCols - 1));
+    endCol = Math.max(0, Math.min(endCol, CONFIG.numCols - 1));
+
+    this.selected = {
+      type: 'range',
+      startRow: Math.min(startRow, endRow),
+      endRow: Math.max(startRow, endRow),
+      startCol: Math.min(startCol, endCol),
+      endCol: Math.max(startCol, endCol)
+    };
+    this.isEditing = false;
+    this.applySelectionVisuals();
   }
 
   //Update page on select all
