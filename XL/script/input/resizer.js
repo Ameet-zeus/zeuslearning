@@ -20,15 +20,13 @@ export class ResizeHelper {
 
     const { startCol, endCol } = this.renderer.getVisibleRange();
 
-    let colX = rowHeaderWidth - scrollX;
-    for (let c = 0; c <= endCol; c++) {
-      if (c > 0) colX += this.renderer.colManager.get(c - 1);
-
-      if (c >= startCol && Math.abs(x - colX) < 5) {
+    const colOffsets = this.renderer.colManager.getCumulativeWidths();
+    for (let c = startCol; c <= endCol; c++) {
+      const colEdge = rowHeaderWidth + colOffsets[c] - scrollX;
+      if (Math.abs(x - colEdge) < 5) {
         return c - 1;
       }
-
-      if (colX > x + 5) break;
+      if (colEdge > x + 5) break;
     }
 
     return -1;

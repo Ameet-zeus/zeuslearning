@@ -20,13 +20,13 @@ export class SelectionManager {
     }
 
     if (y < CONFIG.cellHeight && x >= rowHeaderWidth) {
-      let accX = rowHeaderWidth - scrollX;
+      const colOffsets = this.renderer.colManager.getCumulativeWidths();
       for (let col = 0; col < CONFIG.numCols; col++) {
-        let w = this.renderer.colManager.get(col);
-        if (x >= accX && x < accX + w) {
+        const startX = rowHeaderWidth + colOffsets[col] - scrollX;
+        const endX = rowHeaderWidth + colOffsets[col + 1] - scrollX;
+        if (x >= startX && x < endX) {
           return { type: 'column', col };
         }
-        accX += w;
       }
     }
 
@@ -60,9 +60,6 @@ export class SelectionManager {
     }
     return null;
   }
-  applySelectionVisuals() {
-    this.renderer.drawGrid(this.selected);
-  }
 
   //Update on selecting cell
   selectCell(row, col, edit = false) {
@@ -70,9 +67,8 @@ export class SelectionManager {
       row >= CONFIG.numRows || col >= CONFIG.numCols) {
       return;
     }
-    this.selected = { type: 'cell', row, col };
+    this.selected = { type: 'cell', row, col, anchorRow: row, anchorCol: col };
     this.isEditing = edit;
-    this.applySelectionVisuals();
     if (!edit && this.editor) {
       this.editor.blur();
     }
@@ -86,13 +82,14 @@ export class SelectionManager {
       this.selected = {
         type: 'rows',
         start: Math.min(row, endRow),
-        end: Math.max(row, endRow)
+        end: Math.max(row, endRow),
+        anchorRow: row,
+        anchorCol: 0
       };
     } else {
-      this.selected = { type: 'row', row };
+      this.selected = { type: 'row', row, anchorRow: row, anchorCol: 0 };
     }
     this.isEditing = false;
-    this.applySelectionVisuals();
   }
 
   //Update page on selecting column
@@ -103,13 +100,14 @@ export class SelectionManager {
       this.selected = {
         type: 'columns',
         start: Math.min(col, endCol),
-        end: Math.max(col, endCol)
+        end: Math.max(col, endCol),
+        anchorRow: 0,
+        anchorCol: col
       };
     } else {
-      this.selected = { type: 'column', col };
+      this.selected = { type: 'column', col, anchorRow: 0, anchorCol: col };
     }
     this.isEditing = false;
-    this.applySelectionVisuals();
   }
 
   // Cell range selection
@@ -124,10 +122,12 @@ export class SelectionManager {
       startRow: Math.min(startRow, endRow),
       endRow: Math.max(startRow, endRow),
       startCol: Math.min(startCol, endCol),
-      endCol: Math.max(startCol, endCol)
+      endCol: Math.max(startCol, endCol),
+      anchorRow: startRow,
+      anchorCol: startCol
     };
     this.isEditing = false;
-    this.applySelectionVisuals();
+    this.renderer.drawGrid(this.selected);
   }
 
   //Update page on select all

@@ -25,7 +25,7 @@ function generateRandomData(numRecords) {
 
 const randomData = generateRandomData(100000);
 
-fs.writeFile('./data/info.json', JSON.stringify(randomData, null, 2), (err) => {
+fs.writeFile('./info.json', JSON.stringify(randomData, null, 2), (err) => {
     if (err) {
         console.error('Error writing to file', err);
     } else {
