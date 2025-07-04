@@ -1,18 +1,21 @@
 import { CONFIG } from "../config.js";
 
-/**
- * @param rowHeight to store row heights in map
- * @param cumulativeHeights to store cumulative height
- * @param isDirty to check whether cumulative height is upto date
- */
 export class RowManager {
+  /**
+    * @param rowHeight to store row heights in map
+    * @param cumulativeHeights to store cumulative height
+    * @param isDirty to check whether cumulative height is upto date
+ */
   constructor() {
     this.rowHeight = new Map();
     this.cumulativeHeights = [];
     this.isDirty = true;
   }
 
-  //Set value in map
+  /**
+   * @param {*} row row index to set height for
+   * @param {*} value value to set as height
+   */
   set(row, value) {
     const key = `R${row}`;
     if (value === "" || value == null) {
@@ -23,13 +26,18 @@ export class RowManager {
     this.isDirty = true;
   }
 
-  //Get value from map
+  /**
+   * @param {*} row row index to get height for
+   * @returns the height of the specified row or a default height if not set
+   */
   get(row) {
     const key = `R${row}`;
     return this.rowHeight.get(key) || CONFIG.cellHeight;
   }
 
-  //Get cumulative heights
+  /**
+   * @returns the cumulative heights of all rows
+   */
   getCumulativeHeights() {
     if (!this.isDirty && this.cumulativeHeights.length === CONFIG.numRows + 1) {
       return this.cumulativeHeights;

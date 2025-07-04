@@ -1,6 +1,11 @@
 import { CONFIG } from "../config.js";
 
 export class SelectionManager {
+  /**
+   * @param {*} viewport To manage the viewport
+   * @param {*} renderer To render the grid
+   * @param {*} data To manage the data
+   */
   constructor(viewport, renderer, data) {
     this.viewport = viewport;
     this.renderer = renderer;
@@ -10,7 +15,11 @@ export class SelectionManager {
     this.editor = document.getElementById("cell-editor");
   }
 
-  //Get the type of selection
+  /**
+   * @param {*} x x-coordinate of the mouse
+   * @param {*} y y-coordinate of the mouse
+   * @returns the cell row and column based on mouse position
+   */
   getCellFromMouse(x, y) {
     const { scrollX, scrollY } = this.viewport;
     const rowHeaderWidth = this.renderer.rowHeaderWidth;
@@ -61,7 +70,12 @@ export class SelectionManager {
     return null;
   }
 
-  //Update on selecting cell
+  /**
+   * @param {*} row row index of the cell
+   * @param {*} col column index of the cell
+   * @param {*} edit flag to indicate whether to edit the cell
+   * @returns selects the cell and optionally starts editing
+   */
   selectCell(row, col, edit = false) {
     if (row == null || col == null || row < 0 || col < 0 ||
       row >= CONFIG.numRows || col >= CONFIG.numCols) {
@@ -72,9 +86,14 @@ export class SelectionManager {
     if (!edit && this.editor) {
       this.editor.blur();
     }
+    if (window.updateStatusBar) window.updateStatusBar(this.selected, this.data);
   }
 
-  //Update page on selecting row
+  /**
+   * @param {*} row row index of the row to select
+   * @param {*} endRow end row index for range selection
+   * @returns this.selected object with row selection details
+   */
   selectRow(row, endRow = null) {
     if (row < 0 || row >= CONFIG.numRows) return;
     if (endRow !== null && (endRow < 0 || endRow >= CONFIG.numRows)) return;
@@ -90,9 +109,14 @@ export class SelectionManager {
       this.selected = { type: 'row', row, anchorRow: row, anchorCol: 0 };
     }
     this.isEditing = false;
+    if (window.updateStatusBar) window.updateStatusBar(this.selected, this.data);
   }
 
-  //Update page on selecting column
+  /**
+   * @param {*} col col index of the column to select
+   * @param {*} endCol end column index for range selection
+   * @returns this.selected object with column selection details
+   */
   selectColumn(col, endCol = null) {
     if (col < 0 || col >= CONFIG.numCols) return;
     if (endCol !== null && (endCol < 0 || endCol >= CONFIG.numCols)) return;
@@ -108,9 +132,16 @@ export class SelectionManager {
       this.selected = { type: 'column', col, anchorRow: 0, anchorCol: col };
     }
     this.isEditing = false;
+    if (window.updateStatusBar) window.updateStatusBar(this.selected, this.data);
   }
 
-  // Cell range selection
+  /**
+   * @param {*} startRow start row index of the range
+   * @param {*} startCol start column index of the range
+   * @param {*} endRow end row index of the range
+   * @param {*} endCol end column index of the range
+   * @returns selects a range of cells from start to end row and column
+   */
   selectCellRange(startRow, startCol, endRow, endCol) {
     startRow = Math.max(0, Math.min(startRow, CONFIG.numRows - 1));
     endRow = Math.max(0, Math.min(endRow, CONFIG.numRows - 1));
@@ -128,23 +159,32 @@ export class SelectionManager {
     };
     this.isEditing = false;
     this.renderer.drawGrid(this.selected);
+    if (window.updateStatusBar) window.updateStatusBar(this.selected, this.data);
   }
 
-  //Update page on select all
+  /**
+   * Selects all cells in the grid.
+   */
   selectAll() {
     this.selected = { type: 'all' };
     this.isEditing = false;
     this.renderer.drawGrid(this.selected);
+    if (window.updateStatusBar) window.updateStatusBar(this.selected, this.data);
   }
 
-  //Update page on clear selection
+  /**
+   * Clears the current selection.
+   */
   clearSelection() {
     this.selected = null;
     this.isEditing = false;
     this.renderer.drawGrid();
+    if (window.updateStatusBar) window.updateStatusBar(this.selected, this.data);
   }
 
-  //Get selected cell
+  /**
+   * @returns the currently selected cell or range of cells
+   */
   getSelection() {
     return this.selected;
   }

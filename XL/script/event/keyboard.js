@@ -1,11 +1,18 @@
 import { CONFIG } from "../config.js";
+import { CommandRegistry } from "../commands/commands.js";
 
 export class KeyboardEvents {
+  /**
+   * @param {*} inputManager to manage user inputs
+   */
   constructor(inputManager) {
     this.inputManager = inputManager;
     this.attach();
   }
 
+  /**
+   * Attaches keyboard event listeners to the editor and document.
+   */
   attach() {
     this.inputManager.editor.addEventListener("keydown", (e) => {
       e.stopPropagation();
@@ -23,6 +30,7 @@ export class KeyboardEvents {
 
         if (sel && sel.type === 'cell') {
           this.inputManager.data.set(sel.row, sel.col, val);
+          if (window.updateStatusBar) window.updateStatusBar(sel, this.inputManager.data);
         }
 
         this.inputManager.hideEditor();
@@ -87,9 +95,37 @@ export class KeyboardEvents {
         return;
       }
 
-      if (sel && sel.type === "cell") {
-        let { row, col } = sel;
+      if (sel && (sel.type === "cell" || sel.type === "range")) {
+        let anchorRow = sel.anchorRow ?? sel.row;
+        let anchorCol = sel.anchorCol ?? sel.col;
+        let row = sel.type === "range" ? sel.endRow : sel.row;
+        let col = sel.type === "range" ? sel.endCol : sel.col;
         let changed = false;
+
+        if (e.shiftKey && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+          let newRow = row, newCol = col;
+          switch (e.key) {
+            case "ArrowUp":
+              if (newRow > 0) newRow--;
+              break;
+            case "ArrowDown":
+              if (newRow < CONFIG.numRows - 1) newRow++;
+              break;
+            case "ArrowLeft":
+              if (newCol > 0) newCol--;
+              break;
+            case "ArrowRight":
+              if (newCol < CONFIG.numCols - 1) newCol++;
+              break;
+          }
+          this.inputManager.selectionManager.selectCellRange(
+            anchorRow, anchorCol, newRow, newCol
+          );
+          this.inputManager.viewport.scrollCellIntoView(newRow, newCol, this.inputManager.renderer);
+          this.inputManager.renderer.drawGrid(this.inputManager.selectionManager.getSelection());
+          e.preventDefault();
+          return;
+        }
 
         switch (e.key) {
           case 'ArrowUp':

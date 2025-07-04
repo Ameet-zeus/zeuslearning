@@ -1,4 +1,5 @@
 export class CONFIG {
+  static NAVBAR_HEIGHT = 57;
   static cellWidth = 100;
   static cellHeight= 30;
   static numCols= 1000;

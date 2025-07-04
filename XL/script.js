@@ -6,6 +6,7 @@ import { EventsManager } from "./script/event/events.js";
 import { SelectionManager } from "./script/input/select.js";
 import { RowManager } from "./script/data/row.js";
 import { ColManager } from "./script/data/column.js";
+import { StatusBar } from "./script/data/statusbar.js";
 
 function init() {
   const canvas = document.getElementById('spreadsheet-canvas');
@@ -17,9 +18,11 @@ function init() {
   const data = new DataManager();
   const rowManager = new RowManager();
   const colManager = new ColManager();
+  const statusBar = new StatusBar();
   const renderer = new Renderer(ctx, viewport, data, rowManager, colManager);
   const selectionManager = new SelectionManager(viewport, renderer, data);
   const inputManager = new InputManager(viewport, renderer, data, selectionManager);
+  window.updateStatusBar = (sel, data) => statusBar.update(sel, data);
 
   new EventsManager(inputManager, viewport, renderer, canvas, ctx, rowManager, colManager);
 

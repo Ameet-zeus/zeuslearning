@@ -9,11 +9,59 @@
 </head>
 
 <body>
-    <div class="nav"></div>
+    <div class="nav">
+        <div class="logo">Excel</div>
+
+        <div class="nav-section">
+            <button class="nav-btn" onclick="addRow()">Add Row Top</button>
+            <button class="nav-btn" onclick="addRow()">Add Row Bottom</button>
+            <button class="nav-btn" onclick="addColumn()">Add Column Left</button>
+            <button class="nav-btn" onclick="addColumn()">Add Column Right</button>
+        </div>
+
+        <div class="nav-section">
+            <button class="nav-btn" id="undo-btn" onclick="undo()" disabled>Undo</button>
+            <button class="nav-btn" id="redo-btn" onclick="redo()" disabled>Redo</button>
+        </div>
+
+        <div class="nav-section">
+            <button class="nav-btn" onclick="copy()">Copy</button>
+            <button class="nav-btn" onclick="paste()">Paste</button>
+        </div>
+    </div>
+
     <div class="wrapper" id="wrapper">
         <canvas id="spreadsheet-canvas"></canvas>
         <div id="scroll-container"></div>
         <input type="text" id="cell-editor">
+    </div>
+
+    <div class="status-bar">
+        <div class="status-separator"></div>
+        <div class="status-item">
+            <span id="cell-reference">Cell: </span>
+        </div>
+        <div class="status-separator"></div>
+        <div class="status-item">
+            <span id="row-col-info">Row: , Col: </span>
+        </div>
+        <div class="status-separator"></div>
+        <div class="status-item">
+            <span id="selection-info">0 cell selected</span>
+        </div>
+        <div class="status-separator"></div>
+        <div class="status-item">
+            <span id="sum-info">Sum: 0</span>
+        </div>
+        <div class="status-separator"></div>
+        <div class="status-item">
+            <span id="count-info">Count: 0</span>
+        </div>
+        <div class="status-separator"></div>
+        <div class="status-item">
+            <span id="average-info">Average: 0</span>
+        </div>
+        <div class="status-separator"></div>
     </div>
     <script src="./script.js" type="module"></script>
 </body>

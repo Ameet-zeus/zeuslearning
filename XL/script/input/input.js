@@ -1,6 +1,12 @@
 import { CONFIG } from "../config.js";
 
 export class InputManager {
+  /**
+   * @param {*} viewport to manage the viewport
+   * @param {*} renderer to render the grid
+   * @param {*} data to manage the data
+   * @param {*} selectionManager to manage cell selection
+   */
   constructor(viewport, renderer, data, selectionManager) {
     this.data = data;
     this.renderer = renderer;
@@ -9,10 +15,20 @@ export class InputManager {
     this.editor = document.getElementById("cell-editor");
   }
 
+  /**
+   * @param {*} x x-coordinate of the mouse
+   * @param {*} y y-coordinate of the mouse
+   * @returns cell row and column based on mouse position
+   */
   getCellFromMouse(x, y) {
     return this.selectionManager.getCellFromMouse(x, y);
   }
 
+  /**
+   * @param {*} row row index of the cell
+   * @param {*} col column index of the cell
+   * @param {*} edit flag to indicate whether to edit the cell
+   */
   selectCell(row, col, edit = false) {
     this.selectionManager.selectCell(row, col, edit);
     if (edit) {
@@ -23,6 +39,11 @@ export class InputManager {
     }
   }
 
+  /**
+   * @param {*} row row index of the cell
+   * @param {*} col column index of the cell
+   * @param {*} show flag to show or hide the editor
+   */
   positionEditor(row, col, show = true) {
     const { scrollX, scrollY } = this.viewport;
     const rowHeaderWidth = this.renderer.rowHeaderWidth;
@@ -31,28 +52,22 @@ export class InputManager {
     const x = this.renderer.getColumnX(col, scrollX);
     const y = this.renderer.getRowY(row, scrollY);
 
-    // Hide editor if the cell is not visible (above header or left of row headers)
     if (y < CONFIG.cellHeight || x < rowHeaderWidth) {
       this.editor.style.display = "none";
       return;
     }
 
-    // Position the editor
     this.editor.style.left = `${x + 2}px`;
-    this.editor.style.top = `${y + 2}px`;
+    this.editor.style.top = `${y + CONFIG.NAVBAR_HEIGHT + 2}px`;
     this.editor.style.width = `${cellWidth - 4}px`;
     this.editor.style.height = `${cellHeight - 4}px`;
     this.editor.style.minWidth = `${cellWidth - 4}px`;
     this.editor.style.minHeight = `${cellHeight - 4}px`;
 
-    // Show editor if requested (for selection positioning)
     if (show) {
-      // Get the current cell value
       const value = this.data.get(row, col) || "";
       this.editor.value = value;
       this.editor.style.display = "block";
-      
-      // Mark editor as positioned but not in edit mode
       this.editor.dataset.positioned = "true";
       this.editor.dataset.anchorRow = row.toString();
       this.editor.dataset.anchorCol = col.toString();
@@ -60,16 +75,19 @@ export class InputManager {
     }
   }
 
+  /**
+   * @param {*} row row index of the cell
+   * @param {*} col column index of the cell
+   * @param {*} initialValue show the editor with an initial value if exists
+   */
   showEditor(row, col, initialValue = null) {
     const value = initialValue !== null ? initialValue : this.data.get(row, col) || "";
     this.editor.value = value;
     this.editor.style.display = "block";
-    this.positionEditor(row, col, false); // Position but don't show again
-    
-    // Mark editor as in edit mode
+    this.positionEditor(row, col, false);
     this.editor.dataset.positioned = "false";
     this.editor.focus();
-    
+
     if (initialValue !== null) {
       this.editor.setSelectionRange(value.length, value.length);
     }
@@ -98,6 +116,9 @@ export class InputManager {
     };
   }
 
+  /**
+   * Hides the editor and resets its state. 
+   */
   hideEditor() {
     this.editor.style.display = "none";
     this.editor.dataset.positioned = "false";

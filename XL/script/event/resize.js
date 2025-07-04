@@ -1,4 +1,11 @@
 export class ResizeEvents {
+  /**
+   * @param {*} inputManager to manage user inputs
+   * @param {*} viewport to manage the viewport
+   * @param {*} renderer to render the grid
+   * @param {*} canvas to draw the grid
+   * @param {*} ctx context of the canvas to draw on
+   */
   constructor(inputManager, viewport, renderer, canvas, ctx) {
     this.inputManager = inputManager;
     this.viewport = viewport;

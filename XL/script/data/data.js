@@ -7,6 +7,11 @@ export class DataManager {
   }
 
   //Set value in map
+  /**
+   * @param {*} row key of row
+   * @param {*} col key of column
+   * @param {*} value data to be set
+   */
   set(row, col, value) {
     const key = `R${row}C${col}`;
     if (value === "" || value == null) {
@@ -17,6 +22,11 @@ export class DataManager {
   }
 
   //Get value from map
+  /**
+   * @param {*} row key of row
+   * @param {*} col key of column
+   * @returns data at the specified row and column or an empty string if not set
+   */
   get(row, col) {
     const key = `R${row}C${col}`;
     return this.data.get(key) || "";

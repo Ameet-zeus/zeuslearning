@@ -2,6 +2,14 @@ import { CONFIG } from "../config.js";
 import { ResizeHelper } from "../input/resizer.js";
 
 export class PointerEvents {
+  /**
+   * @param {*} inputManager to manage user inputs
+   * @param {*} viewport to manage the viewport
+   * @param {*} renderer to render the grid
+   * @param {*} rowManager to manage row heights
+   * @param {*} colManager to manage column widths
+   * @param {*} canvas to draw the grid
+   */
   constructor(inputManager, viewport, renderer, rowManager, colManager, canvas) {
     this.inputManager = inputManager;
     this.viewport = viewport;
@@ -15,6 +23,9 @@ export class PointerEvents {
     this.attach();
   }
 
+  /**
+   * Attaches pointer event listeners to the canvas and wrapper.
+   */
   attach() {
     const wrapper = document.getElementById("wrapper");
     const canvas = this.canvas;
@@ -40,7 +51,6 @@ export class PointerEvents {
       const col = this.resizeHelper.getColEdge(x, y);
       const row = this.resizeHelper.getRowEdge(x, y);
 
-      // Only handle resizing if on edge, and return immediately
       if (col !== -1 && col >= 0) {
         this.resizing = { type: "col", index: col, start: this.colManager.get(col), startPos: x };
         e.preventDefault();
@@ -51,12 +61,12 @@ export class PointerEvents {
         return;
       }
 
-      // Only commit editor and handle selection if NOT resizing
       if (this.inputManager.editor.style.display !== "none") {
         const sel = this.inputManager.selectionManager.getSelection();
         const val = this.inputManager.editor.value;
         if (sel && sel.type === 'cell') {
           this.inputManager.data.set(sel.row, sel.col, val);
+          if (window.updateStatusBar) window.updateStatusBar(sel, this.inputManager.data);
         }
         this.inputManager.hideEditor();
       }
@@ -65,19 +75,15 @@ export class PointerEvents {
       if (result) {
         if (result.type === 'cell') {
           this.inputManager.selectionManager.selectCell(result.row, result.col, false);
-          // Position editor at the clicked cell (Excel-like behavior)
           this.inputManager.positionEditor(result.row, result.col);
         } else if (result.type === 'row') {
           this.inputManager.selectionManager.selectRow(result.row);
-          // Position editor at the first cell of the selected row
           this.inputManager.positionEditor(result.row, 0);
         } else if (result.type === 'column') {
           this.inputManager.selectionManager.selectColumn(result.col);
-          // Position editor at the first cell of the selected column
           this.inputManager.positionEditor(0, result.col);
         } else if (result.type === 'corner') {
           this.inputManager.selectionManager.selectAll();
-          // Position editor at cell A1 for select all
           this.inputManager.positionEditor(0, 0);
         } else {
           this.inputManager.selectionManager.clearSelection();
@@ -93,7 +99,6 @@ export class PointerEvents {
           endRow: result.row,
           endCol: result.col,
           hasMoved: false,
-          // Store the anchor position for editor positioning
           anchorRow: result.type === 'row' ? result.row : (result.type === 'column' ? 0 : result.row),
           anchorCol: result.type === 'column' ? result.col : (result.type === 'row' ? 0 : result.col)
         };
@@ -128,7 +133,6 @@ export class PointerEvents {
       const rect = this.canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-
       const colEdge = this.resizeHelper.getColEdge(x, y);
       const rowEdge = this.resizeHelper.getRowEdge(x, y);
 
@@ -164,7 +168,6 @@ export class PointerEvents {
             result.row,
             result.col
           );
-          // Keep editor positioned at the anchor cell during drag
           this.inputManager.positionEditor(this.dragging.anchorRow, this.dragging.anchorCol);
         } else if (this.dragging.startType === 'row' &&
           (result.type === 'row' || result.type === 'cell')) {
@@ -172,7 +175,6 @@ export class PointerEvents {
             this.dragging.startRow,
             result.row
           );
-          // Keep editor positioned at the first cell of the anchor row
           this.inputManager.positionEditor(this.dragging.anchorRow, 0);
         } else if (this.dragging.startType === 'column' &&
           (result.type === 'column' || result.type === 'cell')) {
@@ -180,7 +182,6 @@ export class PointerEvents {
             this.dragging.startCol,
             result.col
           );
-          // Keep editor positioned at the first cell of the anchor column
           this.inputManager.positionEditor(0, this.dragging.anchorCol);
         }
         this.renderer.drawGrid(this.inputManager.selectionManager.getSelection());
@@ -194,7 +195,6 @@ export class PointerEvents {
       }
 
       if (this.dragging) {
-        // On drag end, ensure editor is still positioned at the anchor point
         if (this.dragging.hasMoved) {
           if (this.dragging.startType === 'cell') {
             this.inputManager.positionEditor(this.dragging.anchorRow, this.dragging.anchorCol);
