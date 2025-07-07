@@ -359,9 +359,28 @@ export class Renderer {
     } else if (selected.type === 'range') {
       this.drawRangeSelection(selected);
       this.drawRangeHeaderUnderlines(selected);
+      this.drawAnchorHighlight(selected.anchorRow, selected.anchorCol);
     } else if (selected.type === 'all') {
       this.drawAllSelection();
     }
+  }
+
+  /**
+   * Draws a white highlight inside the anchor cell of a range selection.
+   * @param {number} row - The row index of the anchor cell.
+   * @param {number} col - The column index of the anchor cell.
+   */
+  drawAnchorHighlight(row, col) {
+    const { ctx, viewport } = this;
+    const { scrollX, scrollY } = viewport;
+    const x = this.getColumnX(col, scrollX);
+    const y = this.getRowY(row, scrollY);
+    const cellWidth = this.getColumnWidth(col);
+    const cellHeight = this.getRowHeight(row);
+    ctx.save();
+    ctx.fillStyle = '#FFFFFF'; // White fill inside
+    ctx.fillRect(x + 1, y + 1, cellWidth - 2, cellHeight - 2);
+    ctx.restore();
   }
 
   /**

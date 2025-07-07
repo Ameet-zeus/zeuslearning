@@ -161,16 +161,20 @@ export class PointerEvents {
         this.dragging.endRow = result.row;
         this.dragging.endCol = result.col;
 
-        if (this.dragging.startType === 'cell' && result.type === 'cell') {
-          this.inputManager.selectionManager.selectCellRange(
-            this.dragging.startRow,
-            this.dragging.startCol,
-            result.row,
-            result.col
-          );
-          this.inputManager.positionEditor(this.dragging.anchorRow, this.dragging.anchorCol);
-        } else if (this.dragging.startType === 'row' &&
-          (result.type === 'row' || result.type === 'cell')) {
+if (this.dragging.startType === 'cell' && result.type === 'cell') {
+  if (this.dragging.startRow === result.row && this.dragging.startCol === result.col) {
+    this.inputManager.selectionManager.selectCell(result.row, result.col, false);
+  } else {
+    this.inputManager.selectionManager.selectCellRange(
+      this.dragging.startRow,
+      this.dragging.startCol,
+      result.row,
+      result.col
+    );
+  }
+  this.inputManager.positionEditor(this.dragging.anchorRow, this.dragging.anchorCol);
+} else if (this.dragging.startType === 'row' &&
+  (result.type === 'row' || result.type === 'cell')) {
           this.inputManager.selectionManager.selectRow(
             this.dragging.startRow,
             result.row

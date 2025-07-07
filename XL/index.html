@@ -13,15 +13,15 @@
         <div class="logo">Excel</div>
 
         <div class="nav-section">
-            <button class="nav-btn" onclick="addRow()">Add Row Top</button>
-            <button class="nav-btn" onclick="addRow()">Add Row Bottom</button>
-            <button class="nav-btn" onclick="addColumn()">Add Column Left</button>
-            <button class="nav-btn" onclick="addColumn()">Add Column Right</button>
+            <button class="nav-btn" onclick="AddHandlerInstance.addRowTop()">Add Row Top</button>
+            <button class="nav-btn" onclick="AddHandlerInstance.addRowBottom()">Add Row Bottom</button>
+            <button class="nav-btn" onclick="AddHandlerInstance.addColumnLeft()">Add Column Left</button>
+            <button class="nav-btn" onclick="AddHandlerInstance.addColumnRight()">Add Column Right</button>
         </div>
 
         <div class="nav-section">
-            <button class="nav-btn" id="undo-btn" onclick="undo()" disabled>Undo</button>
-            <button class="nav-btn" id="redo-btn" onclick="redo()" disabled>Redo</button>
+            <button class="nav-btn" id="undo-btn" onclick="undo()">Undo</button>
+            <button class="nav-btn" id="redo-btn" onclick="redo()">Redo</button>
         </div>
 
         <div class="nav-section">
@@ -60,6 +60,14 @@
         <div class="status-separator"></div>
         <div class="status-item">
             <span id="average-info">Average: 0</span>
+        </div>
+        <div class="status-separator"></div>
+        <div class="max-info">
+            <span id="max-info">Max: 0</span>
+        </div>
+        <div class="status-separator"></div>
+        <div class="min-info">
+            <span id="min-info">Min: 0</span>
         </div>
         <div class="status-separator"></div>
     </div>

@@ -1,5 +1,5 @@
 import { Viewport } from "./script/viewport.js";
-import { Renderer } from "./script/rederer.js";
+import { Renderer } from "./script/renderer.js";
 import { DataManager } from "./script/data/data.js";
 import { InputManager } from "./script/input/input.js";
 import { EventsManager } from "./script/event/events.js";
@@ -7,6 +7,7 @@ import { SelectionManager } from "./script/input/select.js";
 import { RowManager } from "./script/data/row.js";
 import { ColManager } from "./script/data/column.js";
 import { StatusBar } from "./script/data/statusbar.js";
+import { AddHandler } from "./script/input/add.js";
 
 function init() {
   const canvas = document.getElementById('spreadsheet-canvas');
@@ -23,6 +24,8 @@ function init() {
   const selectionManager = new SelectionManager(viewport, renderer, data);
   const inputManager = new InputManager(viewport, renderer, data, selectionManager);
   window.updateStatusBar = (sel, data) => statusBar.update(sel, data);
+
+  window.AddHandlerInstance = new AddHandler(selectionManager, data);
 
   new EventsManager(inputManager, viewport, renderer, canvas, ctx, rowManager, colManager);
 

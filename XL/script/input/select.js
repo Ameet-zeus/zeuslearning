@@ -155,7 +155,9 @@ export class SelectionManager {
       startCol: Math.min(startCol, endCol),
       endCol: Math.max(startCol, endCol),
       anchorRow: startRow,
-      anchorCol: startCol
+      anchorCol: startCol,
+      activeRow: endRow,
+      activeCol: endCol
     };
     this.isEditing = false;
     this.renderer.drawGrid(this.selected);

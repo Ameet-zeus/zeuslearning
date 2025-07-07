@@ -66,11 +66,6 @@ body {
     background-color: #dee2e6;
 }
 
-.nav-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
 .wrapper {
     height: calc(100vh - 100px);
     width: 100vw;
@@ -98,7 +93,7 @@ body {
     position: fixed;
     display: none;
     z-index: 1000;
-    outline: green solid 2px;
+    outline: none;
     box-sizing: border-box;
     padding: 4px;
     border: none;

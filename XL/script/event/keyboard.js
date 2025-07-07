@@ -1,7 +1,79 @@
 import { CONFIG } from "../config.js";
-import { CommandRegistry } from "../commands/commands.js";
 
 export class KeyboardEvents {
+  /**
+   * Moves the anchor cell within a range selection
+   * @param {*} sel Current selection object
+   * @param {*} direction Direction to move: 'down', 'right', 'left', 'up'
+   */
+  moveAnchorInRange(sel, direction) {
+    if (sel.type !== 'range') return;
+
+    const { startRow, endRow, startCol, endCol } = sel;
+    let currentAnchorRow = sel.anchorRow;
+    let currentAnchorCol = sel.anchorCol;
+
+    let newAnchorRow = currentAnchorRow;
+    let newAnchorCol = currentAnchorCol;
+
+    switch (direction) {
+      case 'down':
+        newAnchorRow++;
+        if (newAnchorRow > endRow) {
+          newAnchorRow = startRow;
+          newAnchorCol++;
+          if (newAnchorCol > endCol) {
+            newAnchorCol = startCol;
+          }
+        }
+        break;
+      case 'right':
+        newAnchorCol++;
+        if (newAnchorCol > endCol) {
+          newAnchorCol = startCol;
+          newAnchorRow++;
+          if (newAnchorRow > endRow) {
+            newAnchorRow = startRow;
+          }
+        }
+        break;
+      case 'left':
+        newAnchorCol--;
+        if (newAnchorCol < startCol) {
+          newAnchorCol = endCol;
+          newAnchorRow--;
+          if (newAnchorRow < startRow) {
+            newAnchorRow = endRow;
+          }
+        }
+        break;
+      case 'up':
+        newAnchorRow--;
+        if (newAnchorRow < startRow) {
+          newAnchorRow = endRow;
+          newAnchorCol--;
+          if (newAnchorCol < startCol) {
+            newAnchorCol = endCol;
+          }
+        }
+        break;
+    }
+
+
+
+    // Update the selection with the new anchor position
+    const newSelection = {
+      ...sel,
+      anchorRow: newAnchorRow,
+      anchorCol: newAnchorCol
+    };
+
+    this.inputManager.selectionManager.selected = newSelection;
+    this.inputManager.viewport.scrollCellIntoView(newAnchorRow, newAnchorCol, this.inputManager.renderer);
+    this.inputManager.renderer.drawGrid(newSelection);
+    if (window.updateStatusBar) window.updateStatusBar(newSelection, this.inputManager.data);
+  }
+
   /**
    * @param {*} inputManager to manage user inputs
    */
@@ -11,26 +83,60 @@ export class KeyboardEvents {
   }
 
   /**
+     * Commits the value from the editor to the data model based on the selection type
+     */
+  commitEditorValue(sel, val) {
+    if (!sel) return;
+
+    switch (sel.type) {
+      case 'cell':
+        this.inputManager.data.set(sel.row, sel.col, val);
+        break;
+      case 'range':
+        this.inputManager.data.set(sel.anchorRow, sel.anchorCol, val);
+        break;
+      case 'row':
+      case 'rows':
+        this.inputManager.data.set(sel.anchorRow, 0, val);
+        break;
+      case 'column':
+      case 'columns':
+        this.inputManager.data.set(0, sel.anchorCol, val);
+        break;
+      case 'all':
+        this.inputManager.data.set(0, 0, val);
+        break;
+    }
+
+    if (window.updateStatusBar) {
+      window.updateStatusBar(sel, this.inputManager.data);
+    }
+  }
+
+  /**
    * Attaches keyboard event listeners to the editor and document.
    */
   attach() {
+
     this.inputManager.editor.addEventListener("keydown", (e) => {
       e.stopPropagation();
 
+      const sel = this.inputManager.selectionManager.getSelection();
+      const val = this.inputManager.editor.value;
+
+      // Handle Escape key
       if (e.key === "Escape") {
         e.preventDefault();
         this.inputManager.hideEditor();
         return;
       }
 
+      // Handle Enter key
       if (e.key === "Enter") {
         e.preventDefault();
-        const sel = this.inputManager.selectionManager.getSelection();
-        const val = this.inputManager.editor.value;
 
-        if (sel && sel.type === 'cell') {
-          this.inputManager.data.set(sel.row, sel.col, val);
-          if (window.updateStatusBar) window.updateStatusBar(sel, this.inputManager.data);
+        if (sel) {
+          this.commitEditorValue(sel, val);
         }
 
         this.inputManager.hideEditor();
@@ -41,7 +147,34 @@ export class KeyboardEvents {
             this.inputManager.selectCell(newRow, sel.col, false);
             this.inputManager.viewport.scrollCellIntoView(newRow, sel.col, this.inputManager.renderer);
           }
+        } else if (sel && sel.type === 'range') {
+          this.moveAnchorInRange(sel, 'down');
         }
+
+        this.inputManager.renderer.drawGrid(this.inputManager.selectionManager.getSelection());
+        return;
+      }
+
+      // Handle Tab key
+      if (e.key === "Tab") {
+        e.preventDefault();
+
+        if (sel) {
+          this.commitEditorValue(sel, val);
+        }
+
+        this.inputManager.hideEditor();
+
+        if (sel && sel.type === 'cell') {
+          let newCol = sel.col + (e.shiftKey ? -1 : 1);
+          if (newCol >= 0 && newCol < CONFIG.numCols) {
+            this.inputManager.selectCell(sel.row, newCol, false);
+            this.inputManager.viewport.scrollCellIntoView(sel.row, newCol, this.inputManager.renderer);
+          }
+        } else if (sel && sel.type === 'range') {
+          this.moveAnchorInRange(sel, e.shiftKey ? 'left' : 'right');
+        }
+
         this.inputManager.renderer.drawGrid(this.inputManager.selectionManager.getSelection());
         return;
       }
@@ -98,8 +231,15 @@ export class KeyboardEvents {
       if (sel && (sel.type === "cell" || sel.type === "range")) {
         let anchorRow = sel.anchorRow ?? sel.row;
         let anchorCol = sel.anchorCol ?? sel.col;
-        let row = sel.type === "range" ? sel.endRow : sel.row;
-        let col = sel.type === "range" ? sel.endCol : sel.col;
+        let row, col;
+        if (sel.type === "range") {
+          row = sel.activeRow ?? sel.endRow;
+          col = sel.activeCol ?? sel.endCol;
+        } else {
+          row = sel.row;
+          col = sel.col;
+        }
+
         let changed = false;
 
         if (e.shiftKey && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
@@ -159,12 +299,16 @@ export class KeyboardEvents {
           case 'Tab':
             e.preventDefault();
             if (e.shiftKey) {
-              if (col > 0) {
+              if (sel.type === 'range') {
+                this.moveAnchorInRange(sel, 'left');
+              } else if (col > 0) {
                 col--;
                 changed = true;
               }
             } else {
-              if (col < CONFIG.numCols - 1) {
+              if (sel.type === 'range') {
+                this.moveAnchorInRange(sel, 'right');
+              } else if (col < CONFIG.numCols - 1) {
                 col++;
                 changed = true;
               }
@@ -172,7 +316,9 @@ export class KeyboardEvents {
             break;
           case 'Enter':
             e.preventDefault();
-            this.inputManager.showEditor(row, col);
+            const editRow = sel.type === "range" ? anchorRow : row;
+            const editCol = sel.type === "range" ? anchorCol : col;
+            this.inputManager.showEditor(editRow, editCol);
             const editor = this.inputManager.editor;
             if (editor) {
               const val = editor.value;
@@ -184,11 +330,15 @@ export class KeyboardEvents {
             break;
           case 'F2':
             e.preventDefault();
-            this.inputManager.showEditor(row, col);
+            const f2EditRow = sel.type === "range" ? anchorRow : row;
+            const f2EditCol = sel.type === "range" ? anchorCol : col;
+            this.inputManager.showEditor(f2EditRow, f2EditCol);
             return;
           default:
             if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-              this.inputManager.showEditor(row, col, e.key);
+              const typeEditRow = sel.type === "range" ? anchorRow : row;
+              const typeEditCol = sel.type === "range" ? anchorCol : col;
+              this.inputManager.showEditor(typeEditRow, typeEditCol, e.key);
               e.preventDefault();
             }
             return;

@@ -6,6 +6,8 @@ export class StatusBar {
     this.sumInfo = document.getElementById("sum-info");
     this.countInfo = document.getElementById("count-info");
     this.avgInfo = document.getElementById("average-info");
+    this.minInfo = document.getElementById("min-info");
+    this.maxInfo = document.getElementById("max-info");
   }
 
   getColumnLabel(index) {
@@ -25,6 +27,8 @@ export class StatusBar {
       this.sumInfo.textContent = "Sum: 0";
       this.countInfo.textContent = "Count: 0";
       this.avgInfo.textContent = "Average: 0";
+      this.minInfo.textContent = "Min: 0";
+      this.maxInfo.textContent = "Max: 0";
       return;
     }
 
@@ -39,6 +43,8 @@ export class StatusBar {
       this.sumInfo.textContent = `Sum: ${isNum ? val : 0}`;
       this.countInfo.textContent = `Count: ${isNum ? 1 : 0}`;
       this.avgInfo.textContent = `Average: ${isNum ? val : 0}`;
+      this.minInfo.textContent = `Min: ${isNum ? val : 0}`;
+      this.maxInfo.textContent = `Max: ${isNum ? val : 0}`;
       return;
     }
 
@@ -59,22 +65,28 @@ export class StatusBar {
         startRow = 0;
         endRow = data.data ? Math.max(...[...data.data.keys()].map(k => parseInt(k.split("R")[1].split("C")[0]))) : 0;
       }
-      let count = 0, sum = 0;
+
+      let count = 0, sum = 0, min = Infinity, max = -Infinity;
       for (let r = startRow; r <= endRow; r++) {
         for (let c = startCol; c <= endCol; c++) {
           const v = parseFloat(data.get(r, c));
           if (!isNaN(v)) {
             sum += v;
             count++;
+            if (v < min) min = v;
+            if (v > max) max = v;
           }
         }
       }
+
       this.cellRef.textContent = `Cell: ${this.getColumnLabel(startCol)}${startRow + 1}`;
       this.rowColInfo.textContent = `Row: ${startRow + 1}, Col: ${this.getColumnLabel(startCol)}`;
       this.selectionInfo.textContent = `${(endRow - startRow + 1) * (endCol - startCol + 1)} cells selected`;
       this.sumInfo.textContent = `Sum: ${sum}`;
       this.countInfo.textContent = `Count: ${count}`;
       this.avgInfo.textContent = `Average: ${count ? (sum / count).toFixed(2) : 0}`;
+      this.minInfo.textContent = `Min: ${count ? min : 0}`;
+      this.maxInfo.textContent = `Max: ${count ? max : 0}`;
       return;
     }
 
@@ -85,6 +97,8 @@ export class StatusBar {
       this.sumInfo.textContent = "";
       this.countInfo.textContent = "";
       this.avgInfo.textContent = "";
+      this.minInfo.textContent = "";
+      this.maxInfo.textContent = "";
       return;
     }
   }

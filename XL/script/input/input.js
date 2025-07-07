@@ -52,11 +52,6 @@ export class InputManager {
     const x = this.renderer.getColumnX(col, scrollX);
     const y = this.renderer.getRowY(row, scrollY);
 
-    if (y < CONFIG.cellHeight || x < rowHeaderWidth) {
-      this.editor.style.display = "none";
-      return;
-    }
-
     this.editor.style.left = `${x + 2}px`;
     this.editor.style.top = `${y + CONFIG.NAVBAR_HEIGHT + 2}px`;
     this.editor.style.width = `${cellWidth - 4}px`;
@@ -71,6 +66,7 @@ export class InputManager {
       this.editor.dataset.positioned = "true";
       this.editor.dataset.anchorRow = row.toString();
       this.editor.dataset.anchorCol = col.toString();
+      // Do not focus editor on selection, only on double click or keyboard input
       this.editor.blur();
     }
   }
