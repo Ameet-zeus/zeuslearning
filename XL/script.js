@@ -7,11 +7,14 @@ import { SelectionManager } from "./script/input/select.js";
 import { RowManager } from "./script/data/row.js";
 import { ColManager } from "./script/data/column.js";
 import { StatusBar } from "./script/data/statusbar.js";
-import { AddHandler } from "./script/input/add.js";
+import { AddHandler } from "./script/modify/add.js";
+import { initSheet } from "./script/modify/initSheet.js";
 
 function init() {
-  const canvas = document.getElementById('spreadsheet-canvas');
-  const ctx = canvas.getContext('2d');
+  initSheet();
+
+  const canvas = document.getElementById("spreadsheet-canvas");
+  const ctx = canvas.getContext("2d");
 
   const viewport = new Viewport();
   viewport.resizeCanvas(canvas, ctx);
@@ -22,12 +25,25 @@ function init() {
   const statusBar = new StatusBar();
   const renderer = new Renderer(ctx, viewport, data, rowManager, colManager);
   const selectionManager = new SelectionManager(viewport, renderer, data);
-  const inputManager = new InputManager(viewport, renderer, data, selectionManager);
+  const inputManager = new InputManager(
+    viewport,
+    renderer,
+    data,
+    selectionManager
+  );
+
   window.updateStatusBar = (sel, data) => statusBar.update(sel, data);
+  window.AddHandlerInstance = new AddHandler(selectionManager, data, renderer);
 
-  window.AddHandlerInstance = new AddHandler(selectionManager, data);
-
-  new EventsManager(inputManager, viewport, renderer, canvas, ctx, rowManager, colManager);
+  new EventsManager(
+    inputManager,
+    viewport,
+    renderer,
+    canvas,
+    ctx,
+    rowManager,
+    colManager
+  );
 
   renderer.drawGrid();
 }

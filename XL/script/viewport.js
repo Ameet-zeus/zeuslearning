@@ -42,6 +42,7 @@ export class Viewport {
     ctx.scale(dpr, dpr);
 
     this.resize(displayWidth, displayHeight);
+    this.dpr = dpr;
   }
 
   /**
@@ -49,7 +50,7 @@ export class Viewport {
    * @returns aligned coordinate to pixel grid
    */
   alignToPixel(coord) {
-    return Math.floor(coord * this.dpr) / this.dpr + 0.5;
+    return Math.floor(coord * window.devicePixelRatio) / window.devicePixelRatio + 0.5;
   }
 
   /**

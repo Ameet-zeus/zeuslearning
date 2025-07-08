@@ -5,11 +5,11 @@ import { CONFIG } from "./config.js";
  */
 export class Renderer {
   /**
-   * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
-   * @param {Object} viewport - The viewport object with scroll and size info.
-   * @param {Object} data - The data manager for cell values.
-   * @param {Object} rowManager - The row manager for heights.
-   * @param {Object} colManager - The column manager for widths.
+   * @param ctx - The canvas rendering context.
+   * @param {*} viewport - The viewport object with scroll and size info.
+   * @param {*} data - The data manager for cell values.
+   * @param {*} rowManager - The row manager for heights.
+   * @param {*} colManager - The column manager for widths.
    */
   constructor(ctx, viewport, data, rowManager, colManager) {
     this.data = data;
@@ -17,7 +17,6 @@ export class Renderer {
     this.viewport = viewport;
     this.rowManager = rowManager;
     this.colManager = colManager;
-    this.dpr = window.devicePixelRatio || 1;
     this.calculateHeaderWidth();
   }
 
@@ -33,9 +32,9 @@ export class Renderer {
 
   /**
    * Binary search for the offset index.
-   * @param {number[]} offsets - Array of cumulative offsets.
-   * @param {number} value - The value to search for.
-   * @returns {number} The found index.
+   * @param {*} offsets - Array of cumulative offsets.
+   * @param {*} value - The value to search for.
+   * @returns {*} The found index.
    */
   binarySearchOffset(offsets, value) {
     let low = 0, high = offsets.length - 1;
@@ -49,7 +48,7 @@ export class Renderer {
 
   /**
    * Gets the visible range of rows and columns.
-   * @returns {Object} The visible range {startRow, endRow, startCol, endCol}.
+   * @returns {*} The visible range {startRow, endRow, startCol, endCol}.
    */
   getVisibleRange() {
     const { scrollX, scrollY, width, height } = this.viewport;
@@ -64,9 +63,9 @@ export class Renderer {
 
   /**
    * Gets the X coordinate for a column.
-   * @param {number} col - The column index.
-   * @param {number} scrollX - The horizontal scroll offset.
-   * @returns {number} The X coordinate.
+   * @param {*} col - The column index.
+   * @param {*} scrollX - The horizontal scroll offset.
+   * @returns {*} The X coordinate.
    */
   getColumnX(col, scrollX) {
     const colOffsets = this.colManager.getCumulativeWidths();
@@ -75,9 +74,9 @@ export class Renderer {
 
   /**
    * Gets the Y coordinate for a row.
-   * @param {number} row - The row index.
-   * @param {number} scrollY - The vertical scroll offset.
-   * @returns {number} The Y coordinate.
+   * @param {*} row - The row index.
+   * @param {*} scrollY - The vertical scroll offset.
+   * @returns {*} The Y coordinate.
    */
   getRowY(row, scrollY) {
     const rowOffsets = this.rowManager.getCumulativeHeights();
@@ -86,8 +85,8 @@ export class Renderer {
 
   /**
    * Gets the width of a column.
-   * @param {number} col - The column index.
-   * @returns {number} The column width.
+   * @param {*} col - The column index.
+   * @returns {*} The column width.
    */
   getColumnWidth(col) {
     const colOffsets = this.colManager.getCumulativeWidths();
@@ -96,8 +95,8 @@ export class Renderer {
 
   /**
    * Gets the height of a row.
-   * @param {number} row - The row index.
-   * @returns {number} The row height.
+   * @param {*} row - The row index.
+   * @returns {*} The row height.
    */
   getRowHeight(row) {
     const rowOffsets = this.rowManager.getCumulativeHeights();
@@ -106,10 +105,10 @@ export class Renderer {
 
   /**
    * Checks if a column is visible in the viewport.
-   * @param {number} col - The column index.
-   * @param {number} scrollX - The horizontal scroll offset.
-   * @param {number} width - The viewport width.
-   * @returns {boolean} True if visible.
+   * @param {*} col - The column index.
+   * @param {*} scrollX - The horizontal scroll offset.
+   * @param {*} width - The viewport width.
+   * @returns {*} True if visible.
    */
   isColumnVisible(col, scrollX, width) {
     const x = this.getColumnX(col, scrollX);
@@ -119,10 +118,10 @@ export class Renderer {
 
   /**
    * Checks if a row is visible in the viewport.
-   * @param {number} row - The row index.
-   * @param {number} scrollY - The vertical scroll offset.
-   * @param {number} height - The viewport height.
-   * @returns {boolean} True if visible.
+   * @param {*} row - The row index.
+   * @param {*} scrollY - The vertical scroll offset.
+   * @param {*} height - The viewport height.
+   * @returns {*} True if visible.
    */
   isRowVisible(row, scrollY, height) {
     const y = this.getRowY(row, scrollY);
@@ -132,7 +131,7 @@ export class Renderer {
 
   /**
    * Draws the grid, headers, and selection highlights.
-   * @param {Object} selected - The current selection object.
+   * @param {*} selected - The current selection object.
    */
   drawGrid(selected) {
     const { ctx } = this;
@@ -151,16 +150,16 @@ export class Renderer {
 
   /**
    * Draws selection highlights for the given selection.
-   * @param {Object} selected - The selection object.
-   * @param {number} startCol
-   * @param {number} endCol
-   * @param {number} startRow
-   * @param {number} endRow
+   * @param {*} selected - The selection object.
+   * @param {*} startCol
+   * @param {*} endCol
+   * @param {*} startRow
+   * @param {*} endRow
    */
   drawSelectionHighlights(selected, startCol, endCol, startRow, endRow) {
     const { ctx, viewport, rowHeaderWidth } = this;
     const { width, height, scrollX, scrollY } = viewport;
-    const lightGreen = 'rgba(198, 239, 206, 0.7)';
+    const lightGreen = 'rgba(198, 239, 206, 0.6)';
     ctx.fillStyle = lightGreen;
 
     if (selected.type === 'all') {
@@ -200,20 +199,21 @@ export class Renderer {
 
   /**
    * Draws grid lines for visible rows and columns.
-   * @param {number} startCol
-   * @param {number} endCol
-   * @param {number} startRow
-   * @param {number} endRow
+   * @param {*} startCol
+   * @param {*} endCol
+   * @param {*} startRow
+   * @param {*} endRow
    */
   drawGridLines(startCol, endCol, startRow, endRow) {
     const { ctx, viewport, rowHeaderWidth } = this;
     const { scrollX, scrollY, width, height } = viewport;
     ctx.strokeStyle = '#D4D4D4';
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1/window.devicePixelRatio || 1;
 
     for (let col = startCol; col <= endCol + 1 && col <= CONFIG.numCols; col++) {
       const x = this.getColumnX(col, scrollX);
       const alignedX = viewport.alignToPixel(x);
+
       if (alignedX >= rowHeaderWidth && alignedX <= width) {
         ctx.beginPath();
         ctx.moveTo(alignedX, CONFIG.cellHeight);
@@ -235,10 +235,10 @@ export class Renderer {
 
   /**
    * Draws cell content for visible cells.
-   * @param {number} startCol
-   * @param {number} endCol
-   * @param {number} startRow
-   * @param {number} endRow
+   * @param {*} startCol
+   * @param {*} endCol
+   * @param {*} startRow
+   * @param {*} endRow
    */
   drawCellContent(startCol, endCol, startRow, endRow) {
     const { ctx, viewport, rowHeaderWidth } = this;
@@ -269,10 +269,10 @@ export class Renderer {
 
   /**
    * Draws column and row headers.
-   * @param {number} startCol
-   * @param {number} endCol
-   * @param {number} startRow
-   * @param {number} endRow
+   * @param {*} startCol
+   * @param {*} endCol
+   * @param {*} startRow
+   * @param {*} endRow
    */
   drawHeaders(startCol, endCol, startRow, endRow) {
     const { ctx, viewport, rowHeaderWidth } = this;
@@ -283,7 +283,7 @@ export class Renderer {
     ctx.fillRect(0, CONFIG.cellHeight, rowHeaderWidth, height - CONFIG.cellHeight);
 
     ctx.strokeStyle = '#BEBEBE';
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1 / (window.devicePixelRatio || 1);
     ctx.beginPath();
     ctx.moveTo(0, CONFIG.cellHeight);
     ctx.lineTo(width, CONFIG.cellHeight);
@@ -335,25 +335,76 @@ export class Renderer {
 
   /**
    * Draws selection effects (bounding boxes, underlines, etc.) for the selection.
-   * @param {Object} selected - The selection object.
+   * @param {*} selected - The selection object.
    */
   drawSelectionEffects(selected) {
     if (!selected) return;
+    const { ctx, viewport, rowHeaderWidth } = this;
+    const { width, height, scrollX, scrollY } = viewport;
+    const lightGreen = 'rgba(198, 239, 206, 0.3)';
     if (selected.type === 'cell') {
       this.drawCellSelection(selected);
       this.drawHeaderUnderline(selected);
     } else if (selected.type === 'row') {
+      // Highlight all visible column headers for the selected row
+      const { startCol, endCol } = this.getVisibleRange();
+      for (let col = startCol; col <= endCol; col++) {
+        const x = this.getColumnX(col, scrollX);
+        const colWidth = this.getColumnWidth(col);
+        if (this.isColumnVisible(col, scrollX, width)) {
+          ctx.save();
+          ctx.fillStyle = lightGreen;
+          ctx.fillRect(x, 0, colWidth, CONFIG.cellHeight);
+          ctx.restore();
+        }
+      }
       this.drawRowSelection(selected);
       this.drawRowBounding(selected);
       this.drawAllColumnHeaderUnderlines(false);
     } else if (selected.type === 'column') {
+      // Highlight all visible row headers for the selected column
+      const { startRow, endRow } = this.getVisibleRange();
+      for (let row = startRow; row <= endRow; row++) {
+        const y = this.getRowY(row, scrollY);
+        const rowHeight = this.getRowHeight(row);
+        if (this.isRowVisible(row, scrollY, height)) {
+          ctx.save();
+          ctx.fillStyle = lightGreen;
+          ctx.fillRect(0, y, rowHeaderWidth, rowHeight);
+          ctx.restore();
+        }
+      }
       this.drawColumnSelection(selected);
       this.drawColumnBounding(selected);
       this.drawAllRowHeaderUnderlines(false);
     } else if (selected.type === 'rows') {
+      // Highlight all visible column headers for the selected rows
+      const { startCol, endCol } = this.getVisibleRange();
+      for (let col = startCol; col <= endCol; col++) {
+        const x = this.getColumnX(col, scrollX);
+        const colWidth = this.getColumnWidth(col);
+        if (this.isColumnVisible(col, scrollX, width)) {
+          ctx.save();
+          ctx.fillStyle = lightGreen;
+          ctx.fillRect(x, 0, colWidth, CONFIG.cellHeight);
+          ctx.restore();
+        }
+      }
       this.drawMultiRowSelection(selected);
       this.drawAllColumnHeaderUnderlines(false);
     } else if (selected.type === 'columns') {
+      // Highlight all visible row headers for the selected columns
+      const { startRow, endRow } = this.getVisibleRange();
+      for (let row = startRow; row <= endRow; row++) {
+        const y = this.getRowY(row, scrollY);
+        const rowHeight = this.getRowHeight(row);
+        if (this.isRowVisible(row, scrollY, height)) {
+          ctx.save();
+          ctx.fillStyle = lightGreen;
+          ctx.fillRect(0, y, rowHeaderWidth, rowHeight);
+          ctx.restore();
+        }
+      }
       this.drawMultiColumnSelection(selected);
       this.drawAllRowHeaderUnderlines(false);
     } else if (selected.type === 'range') {
@@ -367,8 +418,8 @@ export class Renderer {
 
   /**
    * Draws a white highlight inside the anchor cell of a range selection.
-   * @param {number} row - The row index of the anchor cell.
-   * @param {number} col - The column index of the anchor cell.
+   * @param {*} row - The row index of the anchor cell.
+   * @param {*} col - The column index of the anchor cell.
    */
   drawAnchorHighlight(row, col) {
     const { ctx, viewport } = this;
@@ -385,7 +436,7 @@ export class Renderer {
 
   /**
    * Draws a bounding box around a selected row.
-   * @param {Object} selected - The selection object with row property.
+   * @param {*} selected - The selection object with row property.
    */
   drawRowBounding(selected) {
     const { ctx, viewport } = this;
@@ -404,7 +455,7 @@ export class Renderer {
 
   /**
    * Draws a bounding box around a selected column.
-   * @param {Object} selected - The selection object with col property.
+   * @param {*} selected - The selection object with col property.
    */
   drawColumnBounding(selected) {
     const { ctx, viewport } = this;
@@ -423,7 +474,7 @@ export class Renderer {
 
   /**
    * Draws selection for multiple rows.
-   * @param {Object} selected - The selection object with start and end properties.
+   * @param {*} selected - The selection object with start and end properties.
    */
   drawMultiRowSelection(selected) {
     const { ctx, viewport } = this;
@@ -440,7 +491,7 @@ export class Renderer {
 
   /**
    * Draws selection for multiple columns.
-   * @param {Object} selected - The selection object with start and end properties.
+   * @param {*} selected - The selection object with start and end properties.
    */
   drawMultiColumnSelection(selected) {
     const { ctx, viewport } = this;
@@ -457,7 +508,7 @@ export class Renderer {
 
   /**
    * Draws a bounding box for a range selection.
-   * @param {Object} selected - The selection object with startCol, endCol, startRow, endRow.
+   * @param {*} selected - The selection object with startCol, endCol, startRow, endRow.
    */
   drawRangeSelection(selected) {
     const { ctx, viewport } = this;
@@ -475,7 +526,7 @@ export class Renderer {
 
   /**
    * Highlights headers for a range selection.
-   * @param {Object} selected - The selection object with startCol, endCol, startRow, endRow.
+   * @param {*} selected - The selection object with startCol, endCol, startRow, endRow.
    */
   drawRangeHeaderHighlights(selected) {
     const { ctx, viewport, rowHeaderWidth } = this;
@@ -513,7 +564,7 @@ export class Renderer {
 
   /**
    * Draws header underlines for a range selection.
-   * @param {Object} selected - The selection object with startCol, endCol, startRow, endRow.
+   * @param {*} selected - The selection object with startCol, endCol, startRow, endRow.
    */
   drawRangeHeaderUnderlines(selected) {
     const { ctx, viewport, rowHeaderWidth } = this;
@@ -546,7 +597,7 @@ export class Renderer {
 
   /**
    * Draws a bounding box for a selected cell.
-   * @param {Object} selected - The selection object with row and col.
+   * @param {*} selected - The selection object with row and col.
    */
   drawCellSelection(selected) {
     const { ctx, viewport } = this;
@@ -565,7 +616,7 @@ export class Renderer {
 
   /**
    * Draws a selected row header.
-   * @param {Object} selected - The selection object with row.
+   * @param {*} selected - The selection object with row.
    */
   drawRowSelection(selected) {
     const { ctx, viewport, rowHeaderWidth } = this;
@@ -585,7 +636,7 @@ export class Renderer {
 
   /**
    * Draws a selected column header.
-   * @param {Object} selected - The selection object with col.
+   * @param {*} selected - The selection object with col.
    */
   drawColumnSelection(selected) {
     const { ctx, viewport, rowHeaderWidth } = this;
@@ -605,12 +656,12 @@ export class Renderer {
 
   /**
    * Highlights a column header.
-   * @param {number} col - The column index.
+   * @param {*} col - The column index.
    * @param {CanvasRenderingContext2D} ctx
-   * @param {number} scrollX
-   * @param {number} rowHeaderWidth
-   * @param {Object} viewport
-   * @param {Object} colManager
+   * @param {*} scrollX
+   * @param {*} rowHeaderWidth
+   * @param {*} viewport
+   * @param {*} colManager
    * @param {boolean} [drawText=true]
    */
   highlightColumnHeader(col, ctx, scrollX, rowHeaderWidth, viewport, colManager, drawText = true) {
@@ -634,12 +685,12 @@ export class Renderer {
 
   /**
    * Highlights a row header.
-   * @param {number} row - The row index.
+   * @param {*} row - The row index.
    * @param {CanvasRenderingContext2D} ctx
-   * @param {number} scrollY
-   * @param {number} rowHeaderWidth
-   * @param {Object} viewport
-   * @param {Object} rowManager
+   * @param {*} scrollY
+   * @param {*} rowHeaderWidth
+   * @param {*} viewport
+   * @param {*} rowManager
    * @param {boolean} [drawText=true]
    */
   highlightRowHeader(row, ctx, scrollY, rowHeaderWidth, viewport, rowManager, drawText = true) {
@@ -663,7 +714,7 @@ export class Renderer {
 
   /**
    * Draws header underlines for a selected cell.
-   * @param {Object} selected - The selection object with row and col.
+   * @param {*} selected - The selection object with row and col.
    */
   drawHeaderUnderline(selected) {
     const { ctx, viewport, rowHeaderWidth } = this;
@@ -755,7 +806,7 @@ export class Renderer {
 
   /**
    * Gets the spreadsheet-style column label for a given index.
-   * @param {number} index - The column index.
+   * @param {*} index - The column index.
    * @returns {string} The column label (e.g., "A", "B", ..., "AA").
    */
   getColumnLabel(index) {

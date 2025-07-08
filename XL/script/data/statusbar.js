@@ -1,4 +1,7 @@
 export class StatusBar {
+  /**
+   * Creates a status bar to display information about the current cell selection and data statistics.
+   */
   constructor() {
     this.cellRef = document.getElementById("cell-reference");
     this.rowColInfo = document.getElementById("row-col-info");
@@ -10,6 +13,9 @@ export class StatusBar {
     this.maxInfo = document.getElementById("max-info");
   }
 
+  /**
+   * @param {*} index index of the column to get the label for
+   */
   getColumnLabel(index) {
     let label = "";
     while (index >= 0) {
@@ -19,6 +25,10 @@ export class StatusBar {
     return label;
   }
 
+  /**
+   * @param {*} selection selection object containing information about the selected cells
+   * @param {*} data  data manager containing the data of the grid
+   */
   update(selection, data) {
     if (!selection) {
       this.cellRef.textContent = "Cell: ";

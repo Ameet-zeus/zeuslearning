@@ -28,13 +28,13 @@
             <button class="nav-btn" onclick="copy()">Copy</button>
             <button class="nav-btn" onclick="paste()">Paste</button>
         </div>
+        <div class="nav-section">
+            <button class="nav-btn" onclick="document.getElementById('json-file-input').click()">Load JSON</button>
+            <input type="file" id="json-file-input" accept="application/json" style="display:none" />
+        </div>
     </div>
 
-    <div class="wrapper" id="wrapper">
-        <canvas id="spreadsheet-canvas"></canvas>
-        <div id="scroll-container"></div>
-        <input type="text" id="cell-editor">
-    </div>
+    <!-- initSheet.js -->
 
     <div class="status-bar">
         <div class="status-separator"></div>

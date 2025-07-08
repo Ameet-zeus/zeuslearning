@@ -1,15 +1,14 @@
 import { CONFIG } from "../config.js";
 import { ResizeHelper } from "../input/resizer.js";
+import { CellSelectionStrategy } from "./strategies/CellSelectionStrategy.js";
+import { RowSelectionStrategy } from "./strategies/RowSelectionStrategy.js";
+import { ColumnSelectionStrategy } from "./strategies/ColumnSelectionStrategy.js";
+import { CornerSelectionStrategy } from "./strategies/CornerSelectionStrategy.js";
+import { RowResizeStrategy } from "./strategies/RowResizeStrategy.js";
+import { ColumnResizeStrategy } from "./strategies/ColumnResizeStrategy.js";
+import { CursorStrategy } from "./strategies/CursorStrategy.js";
 
 export class PointerEvents {
-  /**
-   * @param {*} inputManager to manage user inputs
-   * @param {*} viewport to manage the viewport
-   * @param {*} renderer to render the grid
-   * @param {*} rowManager to manage row heights
-   * @param {*} colManager to manage column widths
-   * @param {*} canvas to draw the grid
-   */
   constructor(inputManager, viewport, renderer, rowManager, colManager, canvas) {
     this.inputManager = inputManager;
     this.viewport = viewport;
@@ -17,51 +16,41 @@ export class PointerEvents {
     this.rowManager = rowManager;
     this.colManager = colManager;
     this.canvas = canvas || document.getElementById("spreadsheet-canvas");
-    this.resizing = null;
-    this.dragging = null;
     this.resizeHelper = new ResizeHelper(renderer, viewport);
+    this.strategies = [
+      new RowResizeStrategy(rowManager, renderer, this.canvas, this.resizeHelper),
+      new ColumnResizeStrategy(colManager, renderer, this.canvas, this.resizeHelper),
+      new CellSelectionStrategy(inputManager, renderer, this.canvas),
+      new RowSelectionStrategy(inputManager, renderer, this.canvas),
+      new ColumnSelectionStrategy(inputManager, renderer, this.canvas),
+      new CornerSelectionStrategy({ inputManager, canvas: this.canvas }),
+    ];
+    this.cursorStrategy = new CursorStrategy(renderer, this.canvas, this.resizeHelper);
+    this.activeStrategy = null;
     this.attach();
   }
 
-  /**
-   * Attaches pointer event listeners to the canvas and wrapper.
-   */
   attach() {
     const wrapper = document.getElementById("wrapper");
     const canvas = this.canvas;
+
 
     wrapper.addEventListener("dblclick", (e) => {
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
       const result = this.inputManager.getCellFromMouse(x, y);
-
-      if (result.type === 'cell') {
+      if (result && result.type === 'cell') {
         this.inputManager.selectCell(result.row, result.col, true);
       }
     });
 
     canvas.addEventListener("pointerdown", (e) => {
-      if (this.dragging) return;
+      // If a drag is already in progress, ignore new pointerdown
+      if (this.activeStrategy && this.activeStrategy.dragging) return;
 
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      const col = this.resizeHelper.getColEdge(x, y);
-      const row = this.resizeHelper.getRowEdge(x, y);
-
-      if (col !== -1 && col >= 0) {
-        this.resizing = { type: "col", index: col, start: this.colManager.get(col), startPos: x };
-        e.preventDefault();
-        return;
-      } else if (row !== -1 && row >= 0) {
-        this.resizing = { type: "row", index: row, start: this.rowManager.get(row), startPos: y };
-        e.preventDefault();
-        return;
-      }
-
-      if (this.inputManager.editor.style.display !== "none") {
+      // Hide editor and commit value if open (like pointe.js)
+      if (this.inputManager.editor && this.inputManager.editor.style.display !== "none") {
         const sel = this.inputManager.selectionManager.getSelection();
         const val = this.inputManager.editor.value;
         if (sel && sel.type === 'cell') {
@@ -71,146 +60,28 @@ export class PointerEvents {
         this.inputManager.hideEditor();
       }
 
-      const result = this.inputManager.getCellFromMouse(x, y);
-      if (result) {
-        if (result.type === 'cell') {
-          this.inputManager.selectionManager.selectCell(result.row, result.col, false);
-          this.inputManager.positionEditor(result.row, result.col);
-        } else if (result.type === 'row') {
-          this.inputManager.selectionManager.selectRow(result.row);
-          this.inputManager.positionEditor(result.row, 0);
-        } else if (result.type === 'column') {
-          this.inputManager.selectionManager.selectColumn(result.col);
-          this.inputManager.positionEditor(0, result.col);
-        } else if (result.type === 'corner') {
-          this.inputManager.selectionManager.selectAll();
-          this.inputManager.positionEditor(0, 0);
-        } else {
-          this.inputManager.selectionManager.clearSelection();
-          this.inputManager.hideEditor();
+      for (const strategy of this.strategies) {
+        if (strategy.hitTest && strategy.hitTest(e)) {
+          this.activeStrategy = strategy;
+          if (strategy.onPointerDown) strategy.onPointerDown(e);
+          return;
         }
       }
-
-      if (result) {
-        this.dragging = {
-          startType: result.type,
-          startRow: result.row,
-          startCol: result.col,
-          endRow: result.row,
-          endCol: result.col,
-          hasMoved: false,
-          anchorRow: result.type === 'row' ? result.row : (result.type === 'column' ? 0 : result.row),
-          anchorCol: result.type === 'column' ? result.col : (result.type === 'row' ? 0 : result.col)
-        };
-        e.preventDefault();
-      }
+      this.activeStrategy = null;
     });
 
     document.addEventListener("pointermove", (e) => {
-      if (this.resizing) {
-        const rect = this.canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        if (this.resizing.type === "col") {
-          const delta = x - this.resizing.startPos;
-          let newWidth = this.resizing.start + delta;
-          newWidth = Math.max(20, newWidth);
-          this.colManager.set(this.resizing.index, newWidth);
-          this.renderer.drawGrid(this.inputManager.selectionManager.getSelection());
-          this.canvas.style.cursor = "ew-resize";
-        } else if (this.resizing.type === "row") {
-          const delta = y - this.resizing.startPos;
-          let newHeight = this.resizing.start + delta;
-          newHeight = Math.max(20, newHeight);
-          this.rowManager.set(this.resizing.index, newHeight);
-          this.renderer.drawGrid(this.inputManager.selectionManager.getSelection());
-          this.canvas.style.cursor = "ns-resize";
-        }
-        return;
-      }
-
-      const rect = this.canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const colEdge = this.resizeHelper.getColEdge(x, y);
-      const rowEdge = this.resizeHelper.getRowEdge(x, y);
-
-      if (colEdge !== -1 && y < CONFIG.cellHeight) {
-        this.canvas.style.cursor = "ew-resize";
-      } else if (rowEdge !== -1 && x < this.renderer.rowHeaderWidth) {
-        this.canvas.style.cursor = "ns-resize";
-      } else if (y < CONFIG.cellHeight && x > this.renderer.rowHeaderWidth) {
-        this.canvas.style.cursor = `url('/svg/arrow-down.svg') 8 8, pointer`;
-      } else if (x < this.renderer.rowHeaderWidth && y > CONFIG.cellHeight) {
-        this.canvas.style.cursor = `url('/svg/arrow-right.svg') 8 8, pointer`;
+      if (this.activeStrategy && this.activeStrategy.onPointerMove) {
+        this.activeStrategy.onPointerMove(e);
       } else {
-        this.canvas.style.cursor = "cell";
-      }
-
-      if (!this.dragging) return;
-
-      const result = this.inputManager.getCellFromMouse(x, y);
-
-      if (result && (
-        (result.type === 'cell' && typeof result.row === "number" && typeof result.col === "number") ||
-        (result.type === 'row' && typeof result.row === "number") ||
-        (result.type === 'column' && typeof result.col === "number")
-      )) {
-        this.dragging.hasMoved = true;
-        this.dragging.endRow = result.row;
-        this.dragging.endCol = result.col;
-
-if (this.dragging.startType === 'cell' && result.type === 'cell') {
-  if (this.dragging.startRow === result.row && this.dragging.startCol === result.col) {
-    this.inputManager.selectionManager.selectCell(result.row, result.col, false);
-  } else {
-    this.inputManager.selectionManager.selectCellRange(
-      this.dragging.startRow,
-      this.dragging.startCol,
-      result.row,
-      result.col
-    );
-  }
-  this.inputManager.positionEditor(this.dragging.anchorRow, this.dragging.anchorCol);
-} else if (this.dragging.startType === 'row' &&
-  (result.type === 'row' || result.type === 'cell')) {
-          this.inputManager.selectionManager.selectRow(
-            this.dragging.startRow,
-            result.row
-          );
-          this.inputManager.positionEditor(this.dragging.anchorRow, 0);
-        } else if (this.dragging.startType === 'column' &&
-          (result.type === 'column' || result.type === 'cell')) {
-          this.inputManager.selectionManager.selectColumn(
-            this.dragging.startCol,
-            result.col
-          );
-          this.inputManager.positionEditor(0, this.dragging.anchorCol);
-        }
-        this.renderer.drawGrid(this.inputManager.selectionManager.getSelection());
+        this.cursorStrategy.onPointerMove(e);
       }
     });
 
     document.addEventListener("pointerup", (e) => {
-      if (this.resizing) {
-        this.resizing = null;
-        return;
-      }
-
-      if (this.dragging) {
-        if (this.dragging.hasMoved) {
-          if (this.dragging.startType === 'cell') {
-            this.inputManager.positionEditor(this.dragging.anchorRow, this.dragging.anchorCol);
-          } else if (this.dragging.startType === 'row') {
-            this.inputManager.positionEditor(this.dragging.anchorRow, 0);
-          } else if (this.dragging.startType === 'column') {
-            this.inputManager.positionEditor(0, this.dragging.anchorCol);
-          }
-        }
-
-        this.dragging = null;
-        this.renderer.drawGrid(this.inputManager.selectionManager.getSelection());
+      if (this.activeStrategy && this.activeStrategy.onPointerUp) {
+        this.activeStrategy.onPointerUp(e);
+        this.activeStrategy = null;
       }
     });
 
