@@ -1,3 +1,4 @@
+
 import { Viewport } from "./script/viewport.js";
 import { Renderer } from "./script/renderer.js";
 import { DataManager } from "./script/data/data.js";
@@ -9,7 +10,12 @@ import { ColManager } from "./script/data/column.js";
 import { StatusBar } from "./script/data/statusbar.js";
 import { AddHandler } from "./script/modify/add.js";
 import { initSheet } from "./script/modify/initSheet.js";
+import { LoadDataHandler } from "./script/modify/loadData.js";
+import { CommandManager, EditCellCommand, ResizeRowCommand, ResizeColumnCommand, AddRowCommand, AddColumnCommand } from "./script/commands/commands.js";
 
+/**
+ * Initializes the spreadsheet application.
+ */
 function init() {
   initSheet();
 
@@ -34,6 +40,38 @@ function init() {
 
   window.updateStatusBar = (sel, data) => statusBar.update(sel, data);
   window.AddHandlerInstance = new AddHandler(selectionManager, data, renderer);
+
+  // Add CommandManager instance to window for global access
+  window.CommandManagerInstance = new CommandManager();
+  window.EditCellCommand = EditCellCommand;
+  window.ResizeRowCommand = ResizeRowCommand;
+  window.ResizeColumnCommand = ResizeColumnCommand;
+  window.AddRowCommand = AddRowCommand;
+  window.AddColumnCommand = AddColumnCommand;
+  window.undoXL = () => window.CommandManagerInstance.undo();
+  window.redoXL = () => window.CommandManagerInstance.redo();
+
+  // Add LoadDataHandler instance to window for global access
+  window.LoadDataHandlerInstance = new LoadDataHandler(data, renderer, rowManager, colManager);
+
+  // Set up JSON file input event
+  const jsonInput = document.getElementById("json-file-input");
+  if (jsonInput) {
+    jsonInput.addEventListener("change", function (event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const jsonData = JSON.parse(e.target.result);
+          window.LoadDataHandlerInstance.load(jsonData);
+        } catch (err) {
+          alert("Invalid JSON file.");
+        }
+      };
+      reader.readAsText(file);
+    });
+  }
 
   new EventsManager(
     inputManager,

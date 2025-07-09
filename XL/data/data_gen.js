@@ -6,7 +6,7 @@ function generateRandomData(numRecords) {
     const firstNames = ['Raj', 'John', 'Mia', 'Ava', 'Sophie', 'David', 'James', 'Emily', 'Chris', 'Emma'];
     const lastNames = ['Solanki', 'Smith', 'Johnson', 'Taylor', 'Brown', 'Davis', 'Miller', 'Wilson', 'Moore', 'Anderson'];
     const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
-    const getRandomAge = () => Math.floor(Math.random() * (65 - 18 + 1)) + 18; 
+    const getRandomAge = () => Math.floor(Math.random() * (65 - 18 + 1)) + 18;
     const getRandomSalary = () => Math.floor(Math.random() * (2000000 - 30000 + 1)) + 30000;
     const data = [];
 

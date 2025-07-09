@@ -28,8 +28,12 @@ export class AddHandler {
       console.warn("Invalid selection type for addRowTop:", selection.type);
       return;
     }
-    this.insertRow(insertRow);
-    this.renderer.drawGrid();
+    if (window.CommandManagerInstance && window.AddRowCommand) {
+      window.CommandManagerInstance.executeCommand(new window.AddRowCommand(this, insertRow));
+    } else {
+      this.insertRow(insertRow);
+      this.renderer.drawGrid();
+    }
   }
 
   /**
@@ -48,8 +52,12 @@ export class AddHandler {
       console.warn("Invalid selection type for addRowBottom:", selection.type);
       return;
     }
-    this.insertRow(insertRow);
-    this.renderer.drawGrid();
+    if (window.CommandManagerInstance && window.AddRowCommand) {
+      window.CommandManagerInstance.executeCommand(new window.AddRowCommand(this, insertRow));
+    } else {
+      this.insertRow(insertRow);
+      this.renderer.drawGrid();
+    }
   }
 
   /**
@@ -68,8 +76,12 @@ export class AddHandler {
       console.warn("Invalid selection type for addColumnLeft:", selection.type);
       return;
     }
-    this.insertColumn(insertCol);
-    this.renderer.drawGrid();
+    if (window.CommandManagerInstance && window.AddColumnCommand) {
+      window.CommandManagerInstance.executeCommand(new window.AddColumnCommand(this, insertCol));
+    } else {
+      this.insertColumn(insertCol);
+      this.renderer.drawGrid();
+    }
   }
 
   /**
@@ -88,8 +100,12 @@ export class AddHandler {
       console.warn("Invalid selection type for addColumnRight:", selection.type);
       return;
     }
-    this.insertColumn(insertCol);
-    this.renderer.drawGrid();
+    if (window.CommandManagerInstance && window.AddColumnCommand) {
+      window.CommandManagerInstance.executeCommand(new window.AddColumnCommand(this, insertCol));
+    } else {
+      this.insertColumn(insertCol);
+      this.renderer.drawGrid();
+    }
   }
 
   /**

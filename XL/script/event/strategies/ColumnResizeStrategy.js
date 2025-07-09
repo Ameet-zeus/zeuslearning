@@ -1,4 +1,5 @@
-import { CONFIG } from "../../config.js";
+// ColumnResizeStrategy.js (Fixed)
+import { ResizeColumnCommand } from "../../commands/commands.js";
 
 export class ColumnResizeStrategy {
   constructor(colManager, renderer, canvas, resizer) {
@@ -17,7 +18,6 @@ export class ColumnResizeStrategy {
     return colEdge !== -1;
   }
 
-
   onPointerDown(e) {
     const rect = this.canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -29,6 +29,7 @@ export class ColumnResizeStrategy {
         start: this.colManager.get(colEdge),
         startPos: x,
       };
+      this.originalWidth = this.colManager.get(colEdge);
       e.preventDefault();
     }
   }
@@ -46,6 +47,16 @@ export class ColumnResizeStrategy {
   }
 
   onPointerUp(e) {
+    if (this.resizing && typeof window.CommandManagerInstance !== 'undefined') {
+      const { index } = this.resizing;
+      const newWidth = this.colManager.get(index);
+
+      if (newWidth !== this.originalWidth) {
+        const command = new ResizeColumnCommand(this.colManager, index, newWidth, this.renderer);
+        command.oldWidth = this.originalWidth;
+        window.CommandManagerInstance.executeCommand(command);
+      }
+    }
     this.resizing = null;
   }
 }

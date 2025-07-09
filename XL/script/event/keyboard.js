@@ -84,27 +84,27 @@ export class KeyboardEvents {
      */
   commitEditorValue(sel, val) {
     if (!sel) return;
-
+    const cmdMgr = window.CommandManagerInstance;
+    const { EditCellCommand } = window.CommandManagerInstance.constructor.__proto__.constructor;
     switch (sel.type) {
       case 'cell':
-        this.inputManager.data.set(sel.row, sel.col, val);
+        cmdMgr.executeCommand(new window.EditCellCommand(this.inputManager.data, sel.row, sel.col, val));
         break;
       case 'range':
-        this.inputManager.data.set(sel.anchorRow, sel.anchorCol, val);
+        cmdMgr.executeCommand(new window.EditCellCommand(this.inputManager.data, sel.anchorRow, sel.anchorCol, val));
         break;
       case 'row':
       case 'rows':
-        this.inputManager.data.set(sel.anchorRow, 0, val);
+        cmdMgr.executeCommand(new window.EditCellCommand(this.inputManager.data, sel.anchorRow, 0, val));
         break;
       case 'column':
       case 'columns':
-        this.inputManager.data.set(0, sel.anchorCol, val);
+        cmdMgr.executeCommand(new window.EditCellCommand(this.inputManager.data, 0, sel.anchorCol, val));
         break;
       case 'all':
-        this.inputManager.data.set(0, 0, val);
+        cmdMgr.executeCommand(new window.EditCellCommand(this.inputManager.data, 0, 0, val));
         break;
     }
-
     if (window.updateStatusBar) {
       window.updateStatusBar(sel, this.inputManager.data);
     }
@@ -115,6 +115,21 @@ export class KeyboardEvents {
    */
   attach() {
     document.addEventListener("keydown", (e) => {
+      // Undo/Redo shortcuts
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "z") {
+        e.preventDefault();
+        if (window.CommandManagerInstance) window.CommandManagerInstance.undo();
+        if (window.updateStatusBar) window.updateStatusBar(this.inputManager.selectionManager.getSelection(), this.inputManager.data);
+        this.inputManager.renderer.drawGrid();
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === "y" || (e.shiftKey && e.key.toLowerCase() === "z"))) {
+        e.preventDefault();
+        if (window.CommandManagerInstance) window.CommandManagerInstance.redo();
+        if (window.updateStatusBar) window.updateStatusBar(this.inputManager.selectionManager.getSelection(), this.inputManager.data);
+        this.inputManager.renderer.drawGrid();
+        return;
+      }
       const isEditorFocused = this.inputManager.editor === document.activeElement;
       const isEditorPositioned = this.inputManager.editor.dataset.positioned === "true";
 

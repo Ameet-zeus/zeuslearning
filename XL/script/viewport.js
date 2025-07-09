@@ -50,7 +50,7 @@ export class Viewport {
    * @returns aligned coordinate to pixel grid
    */
   alignToPixel(coord) {
-    return Math.floor(coord * window.devicePixelRatio) / window.devicePixelRatio + 0.5;
+    return Math.floor(coord * (window.devicePixelRatio || 1)) / (window.devicePixelRatio || 1) + 0.5;
   }
 
   /**

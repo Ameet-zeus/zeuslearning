@@ -54,7 +54,11 @@ export class PointerEvents {
         const sel = this.inputManager.selectionManager.getSelection();
         const val = this.inputManager.editor.value;
         if (sel && sel.type === 'cell') {
-          this.inputManager.data.set(sel.row, sel.col, val);
+          if (window.CommandManagerInstance && window.EditCellCommand) {
+            window.CommandManagerInstance.executeCommand(new window.EditCellCommand(this.inputManager.data, sel.row, sel.col, val));
+          } else {
+            this.inputManager.data.set(sel.row, sel.col, val);
+          }
           if (window.updateStatusBar) window.updateStatusBar(sel, this.inputManager.data);
         }
         this.inputManager.hideEditor();

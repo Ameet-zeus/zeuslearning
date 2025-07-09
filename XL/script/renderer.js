@@ -477,9 +477,32 @@ export class Renderer {
    * @param {*} selected - The selection object with start and end properties.
    */
   drawMultiRowSelection(selected) {
-    const { ctx, viewport } = this;
+    const { ctx, viewport, rowHeaderWidth } = this;
     const { scrollY } = viewport;
-    for (let row = selected.start; row <= selected.end; row++) this.drawRowSelection({ row });
+    for (let row = selected.start; row <= selected.end; row++) {
+      ctx.fillStyle = '#107C10';
+      const y = this.getRowY(row, scrollY);
+      const rowHeight = this.getRowHeight(row);
+      if (this.isRowVisible(row, scrollY, viewport.height)) {
+        ctx.fillRect(0, y, rowHeaderWidth, rowHeight);
+        // Draw white separator line at the bottom of the header cell (not over the grid)
+        if (row < selected.end) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.strokeStyle = '#FFF';
+          ctx.lineWidth = 1;
+          ctx.moveTo(0, y + rowHeight);
+          ctx.lineTo(rowHeaderWidth, y + rowHeight);
+          ctx.stroke();
+          ctx.restore();
+        }
+        ctx.fillStyle = '#FFF';
+        ctx.font = 'bold ' + CONFIG.headerFont;
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+        ctx.fillText(row + 1, rowHeaderWidth - 5, y + rowHeight / 2);
+      }
+    }
     const y1 = this.getRowY(selected.start, scrollY);
     const y2 = this.getRowY(selected.end, scrollY) + this.getRowHeight(selected.end);
     ctx.save();
@@ -494,9 +517,32 @@ export class Renderer {
    * @param {*} selected - The selection object with start and end properties.
    */
   drawMultiColumnSelection(selected) {
-    const { ctx, viewport } = this;
+    const { ctx, viewport, rowHeaderWidth } = this;
     const { scrollX } = viewport;
-    for (let col = selected.start; col <= selected.end; col++) this.drawColumnSelection({ col });
+    for (let col = selected.start; col <= selected.end; col++) {
+      const x = this.getColumnX(col, scrollX);
+      const colWidth = this.getColumnWidth(col);
+      if (this.isColumnVisible(col, scrollX, viewport.width)) {
+        ctx.fillStyle = '#107C10';
+        ctx.fillRect(x, 0, colWidth, CONFIG.cellHeight);
+        // Draw white separator line at the right of the header cell (not over the grid)
+        if (col < selected.end) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.strokeStyle = '#FFF';
+          ctx.lineWidth = 1;
+          ctx.moveTo(x + colWidth, 0);
+          ctx.lineTo(x + colWidth, CONFIG.cellHeight);
+          ctx.stroke();
+          ctx.restore();
+        }
+        ctx.fillStyle = '#FFF';
+        ctx.font = 'bold ' + CONFIG.headerFont;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(this.getColumnLabel(col), x + colWidth / 2, CONFIG.cellHeight / 2);
+      }
+    }
     const x1 = this.getColumnX(selected.start, scrollX);
     const x2 = this.getColumnX(selected.end, scrollX) + this.getColumnWidth(selected.end);
     ctx.save();
@@ -577,8 +623,8 @@ export class Renderer {
       const colWidth = this.getColumnWidth(col);
       if (this.isColumnVisible(col, scrollX, width)) {
         ctx.beginPath();
-        ctx.moveTo(x, CONFIG.cellHeight - 2);
-        ctx.lineTo(x + colWidth, CONFIG.cellHeight - 2);
+        ctx.moveTo(x, CONFIG.cellHeight - 1);
+        ctx.lineTo(x + colWidth, CONFIG.cellHeight - 1);
         ctx.stroke();
       }
     }
@@ -587,8 +633,8 @@ export class Renderer {
       const rowHeight = this.getRowHeight(row);
       if (this.isRowVisible(row, scrollY, height)) {
         ctx.beginPath();
-        ctx.moveTo(rowHeaderWidth - 2, y);
-        ctx.lineTo(rowHeaderWidth - 2, y + rowHeight);
+        ctx.moveTo(rowHeaderWidth - 1, y);
+        ctx.lineTo(rowHeaderWidth - 1, y + rowHeight);
         ctx.stroke();
       }
     }
@@ -626,8 +672,17 @@ export class Renderer {
     if (this.isRowVisible(selected.row, scrollY, viewport.height)) {
       ctx.fillStyle = '#107C10';
       ctx.fillRect(0, y, rowHeaderWidth, rowHeight);
+      // Draw white separator line at the bottom
+      ctx.save();
+      ctx.strokeStyle = '#FFF';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, y + rowHeight - 0.5);
+      ctx.lineTo(rowHeaderWidth, y + rowHeight - 0.5);
+      ctx.stroke();
+      ctx.restore();
       ctx.fillStyle = '#FFF';
-      ctx.font = CONFIG.headerFont;
+      ctx.font = 'bold ' + CONFIG.headerFont;
       ctx.textAlign = "right";
       ctx.textBaseline = "middle";
       ctx.fillText(selected.row + 1, rowHeaderWidth - 5, y + rowHeight / 2);
@@ -646,8 +701,17 @@ export class Renderer {
     if (this.isColumnVisible(selected.col, scrollX, viewport.width)) {
       ctx.fillStyle = '#107C10';
       ctx.fillRect(x, 0, colWidth, CONFIG.cellHeight);
+      // Draw white separator line at the right
+      ctx.save();
+      ctx.strokeStyle = '#FFF';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x + colWidth - 0.5, 0);
+      ctx.lineTo(x + colWidth - 0.5, CONFIG.cellHeight);
+      ctx.stroke();
+      ctx.restore();
       ctx.fillStyle = '#FFF';
-      ctx.font = CONFIG.headerFont;
+      ctx.font = 'bold ' + CONFIG.headerFont;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(this.getColumnLabel(selected.col), x + colWidth / 2, CONFIG.cellHeight / 2);
@@ -726,18 +790,20 @@ export class Renderer {
     ctx.lineWidth = 2;
     const x = this.getColumnX(selected.col, scrollX);
     const colWidth = this.getColumnWidth(selected.col);
+    // Draw underline at the very bottom edge of the header (no gap)
     if (x + colWidth > rowHeaderWidth && x < viewport.width) {
       ctx.beginPath();
-      ctx.moveTo(x, CONFIG.cellHeight - 2);
-      ctx.lineTo(x + colWidth, CONFIG.cellHeight - 2);
+      ctx.moveTo(x, CONFIG.cellHeight - 1);
+      ctx.lineTo(x + colWidth, CONFIG.cellHeight - 1);
       ctx.stroke();
     }
     const y = this.getRowY(selected.row, scrollY);
     const rowHeight = this.getRowHeight(selected.row);
+    // Draw vertical line at the very right edge of the row header (no gap)
     if (y + rowHeight > CONFIG.cellHeight && y < viewport.height) {
       ctx.beginPath();
-      ctx.moveTo(rowHeaderWidth - 2, y);
-      ctx.lineTo(rowHeaderWidth - 2, y + rowHeight);
+      ctx.moveTo(rowHeaderWidth - 1, y);
+      ctx.lineTo(rowHeaderWidth - 1, y + rowHeight);
       ctx.stroke();
     }
     ctx.restore();

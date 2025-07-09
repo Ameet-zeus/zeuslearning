@@ -61,7 +61,6 @@ export class CellSelectionStrategy {
 
   onPointerUp(e) {
     this.dragging = null;
-    // Always redraw grid to show final selection
     this.renderer.drawGrid(this.inputManager.selectionManager.getSelection());
   }
 }

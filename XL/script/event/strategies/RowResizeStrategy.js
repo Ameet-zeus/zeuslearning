@@ -1,7 +1,8 @@
-import { CONFIG } from "../../config.js";
+// RowResizeStrategy.js (Fixed)
+import { ResizeRowCommand } from "../../commands/commands.js";
 
 export class RowResizeStrategy {
-  constructor(rowManager, renderer, canvas,resizer) {
+  constructor(rowManager, renderer, canvas, resizer) {
     this.rowManager = rowManager;
     this.renderer = renderer;
     this.canvas = canvas;
@@ -17,7 +18,6 @@ export class RowResizeStrategy {
     return rowEdge !== -1;
   }
 
-
   onPointerDown(e) {
     const rect = this.canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -29,6 +29,7 @@ export class RowResizeStrategy {
         start: this.rowManager.get(rowEdge),
         startPos: y,
       };
+      this.originalHeight = this.rowManager.get(rowEdge);
       e.preventDefault();
     }
   }
@@ -46,6 +47,16 @@ export class RowResizeStrategy {
   }
 
   onPointerUp(e) {
+    if (this.resizing && typeof window.CommandManagerInstance !== 'undefined') {
+      const { index } = this.resizing;
+      const newHeight = this.rowManager.get(index);
+
+      if (newHeight !== this.originalHeight) {
+        const command = new ResizeRowCommand(this.rowManager, index, newHeight, this.renderer);
+        command.oldHeight = this.originalHeight;
+        window.CommandManagerInstance.executeCommand(command);
+      }
+    }
     this.resizing = null;
   }
 }

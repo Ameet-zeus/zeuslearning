@@ -58,24 +58,23 @@ export class StatusBar {
       return;
     }
 
-    // Range selection
     let startRow = selection.startRow ?? selection.row ?? 0;
     let endRow = selection.endRow ?? selection.row ?? 0;
     let startCol = selection.startCol ?? selection.col ?? 0;
     let endCol = selection.endCol ?? selection.col ?? 0;
-    if (selection.type === "range" || selection.type === "rows" || selection.type === "columns") {
-      if (selection.type === "rows") {
-        startRow = selection.start;
-        endRow = selection.end;
-        startCol = 0;
-        endCol = data.data ? Math.max(...[...data.data.keys()].map(k => parseInt(k.split("C")[1]))) : 0;
-      } else if (selection.type === "columns") {
-        startCol = selection.start;
-        endCol = selection.end;
-        startRow = 0;
-        endRow = data.data ? Math.max(...[...data.data.keys()].map(k => parseInt(k.split("R")[1].split("C")[0]))) : 0;
+    if (selection.type === "range") {
+      let maxRow = 0, maxCol = 0;
+      if (data.data && data.data.size > 0) {
+        for (const key of data.data.keys()) {
+          const match = key.match(/^R(\d+)C(\d+)$/);
+          if (match) {
+            const r = parseInt(match[1]);
+            const c = parseInt(match[2]);
+            if (r > maxRow) maxRow = r;
+            if (c > maxCol) maxCol = c;
+          }
+        }
       }
-
       let count = 0, sum = 0, min = Infinity, max = -Infinity;
       for (let r = startRow; r <= endRow; r++) {
         for (let c = startCol; c <= endCol; c++) {
@@ -88,10 +87,87 @@ export class StatusBar {
           }
         }
       }
-
       this.cellRef.textContent = `Cell: ${this.getColumnLabel(startCol)}${startRow + 1}`;
       this.rowColInfo.textContent = `Row: ${startRow + 1}, Col: ${this.getColumnLabel(startCol)}`;
       this.selectionInfo.textContent = `${(endRow - startRow + 1) * (endCol - startCol + 1)} cells selected`;
+      this.sumInfo.textContent = `Sum: ${sum}`;
+      this.countInfo.textContent = `Count: ${count}`;
+      this.avgInfo.textContent = `Average: ${count ? (sum / count).toFixed(2) : 0}`;
+      this.minInfo.textContent = `Min: ${count ? min : 0}`;
+      this.maxInfo.textContent = `Max: ${count ? max : 0}`;
+      return;
+    } else if (selection.type === "rows" || selection.type === "row") {
+      let count = 0, sum = 0, min = Infinity, max = -Infinity;
+      let start, end;
+      if (selection.type === "rows") {
+        start = selection.start;
+        end = selection.end;
+      } else {
+        start = end = selection.row;
+      }
+      for (const key of data.data.keys()) {
+        const match = key.match(/^R(\d+)C(\d+)$/);
+        if (match) {
+          const r = parseInt(match[1]);
+          if (r >= start && r <= end) {
+            const v = parseFloat(data.get(r, parseInt(match[2])));
+            if (!isNaN(v)) {
+              sum += v;
+              count++;
+              if (v < min) min = v;
+              if (v > max) max = v;
+            }
+          }
+        }
+      }
+      if (start === end) {
+        this.cellRef.textContent = `Cell: ${this.getColumnLabel(0)}${start + 1}`;
+        this.rowColInfo.textContent = `Row: ${start + 1}, Col: All`;
+        this.selectionInfo.textContent = `1 row selected`;
+      } else {
+        this.cellRef.textContent = `Cell: ${this.getColumnLabel(0)}${start + 1}`;
+        this.rowColInfo.textContent = `Row: ${start + 1} - ${end + 1}, Col: All`;
+        this.selectionInfo.textContent = `${end - start + 1} rows selected`;
+      }
+      this.sumInfo.textContent = `Sum: ${sum}`;
+      this.countInfo.textContent = `Count: ${count}`;
+      this.avgInfo.textContent = `Average: ${count ? (sum / count).toFixed(2) : 0}`;
+      this.minInfo.textContent = `Min: ${count ? min : 0}`;
+      this.maxInfo.textContent = `Max: ${count ? max : 0}`;
+      return;
+    } else if (selection.type === "columns" || selection.type === "column") {
+      let count = 0, sum = 0, min = Infinity, max = -Infinity;
+      let start, end;
+      if (selection.type === "columns") {
+        start = selection.start;
+        end = selection.end;
+      } else {
+        start = end = selection.col;
+      }
+      for (const key of data.data.keys()) {
+        const match = key.match(/^R(\d+)C(\d+)$/);
+        if (match) {
+          const c = parseInt(match[2]);
+          if (c >= start && c <= end) {
+            const v = parseFloat(data.get(parseInt(match[1]), c));
+            if (!isNaN(v)) {
+              sum += v;
+              count++;
+              if (v < min) min = v;
+              if (v > max) max = v;
+            }
+          }
+        }
+      }
+      if (start === end) {
+        this.cellRef.textContent = `Cell: ${this.getColumnLabel(start)}1`;
+        this.rowColInfo.textContent = `Row: All, Col: ${this.getColumnLabel(start)}`;
+        this.selectionInfo.textContent = `1 column selected`;
+      } else {
+        this.cellRef.textContent = `Cell: ${this.getColumnLabel(start)}1`;
+        this.rowColInfo.textContent = `Row: All, Col: ${this.getColumnLabel(start)} - ${this.getColumnLabel(end)}`;
+        this.selectionInfo.textContent = `${end - start + 1} columns selected`;
+      }
       this.sumInfo.textContent = `Sum: ${sum}`;
       this.countInfo.textContent = `Count: ${count}`;
       this.avgInfo.textContent = `Average: ${count ? (sum / count).toFixed(2) : 0}`;
