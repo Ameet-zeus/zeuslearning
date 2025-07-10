@@ -127,14 +127,12 @@ export class AddRowCommand {
     constructor(addHandler, rowIndex) {
         this.addHandler = addHandler;
         this.rowIndex = rowIndex;
-        // Save a snapshot of data before adding
         this.snapshot = new Map(addHandler.data.data);
     }
     execute() {
         this.addHandler.insertRow(this.rowIndex);
     }
     undo() {
-        // Restore previous data and row count
         this.addHandler.data.data = new Map(this.snapshot);
         if (window.CONFIG) window.CONFIG.numRows -= 1;
         if (this.addHandler.renderer) this.addHandler.renderer.drawGrid();

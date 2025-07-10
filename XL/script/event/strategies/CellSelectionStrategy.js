@@ -1,4 +1,10 @@
 export class CellSelectionStrategy {
+  /**
+   * Handles cell selection and dragging in a spreadsheet-like interface.
+   * @param {*} inputManager to manage user input
+   * @param {*} renderer renderer to render the grid
+   * @param {*} canvas canvas element for rendering
+   */
   constructor(inputManager, renderer, canvas) {
     this.inputManager = inputManager;
     this.renderer = renderer;
@@ -6,6 +12,10 @@ export class CellSelectionStrategy {
     this.dragging = null;
   }
 
+  /**
+   * Checks if the pointer event is a hit on a cell.
+   * @param {*} e Pointer event
+   */
   hitTest(e) {
     const rect = this.canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -14,6 +24,9 @@ export class CellSelectionStrategy {
     return result && result.type === 'cell';
   }
 
+  /**
+   * @param {*} e Pointer event for mouse down
+   */
   onPointerDown(e) {
     const rect = this.canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -34,6 +47,10 @@ export class CellSelectionStrategy {
     }
   }
 
+  /**
+   * Handles pointer move events to update cell selection during dragging.
+   * @param {*} e Pointer event for mouse move
+   */
   onPointerMove(e) {
     if (!this.dragging) return;
     const rect = this.canvas.getBoundingClientRect();
@@ -59,6 +76,10 @@ export class CellSelectionStrategy {
     }
   }
 
+  /**
+    * Handles pointer up events to finalize cell selection.
+   * @param {*} e Pointer event for mouse up
+   */
   onPointerUp(e) {
     this.dragging = null;
     this.renderer.drawGrid(this.inputManager.selectionManager.getSelection());

@@ -1,12 +1,22 @@
 import { CONFIG } from "../../config.js";
 
 export class CursorStrategy {
+  /**
+   * Handles cursor changes based on pointer position in a spreadsheet-like interface.
+   * @param {*} renderer to render the grid
+   * @param {*} canvas canvas element for rendering
+   * @param {*} resizeHelper to assist with resizing logic
+   */
   constructor(renderer, canvas, resizeHelper) {
     this.renderer = renderer;
     this.canvas = canvas;
     this.resizeHelper = resizeHelper;
   }
 
+  /**
+   * Checks if the pointer event is a hit on a resizable edge.
+   * @param {*} e Pointer event
+   */
   onPointerMove(e) {
     const rect = this.canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;

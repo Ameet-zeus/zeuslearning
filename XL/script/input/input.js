@@ -66,7 +66,6 @@ export class InputManager {
       this.editor.dataset.positioned = "true";
       this.editor.dataset.anchorRow = row.toString();
       this.editor.dataset.anchorCol = col.toString();
-      // Do not focus editor on selection, only on double click or keyboard input
       this.editor.blur();
     }
   }
@@ -113,7 +112,7 @@ export class InputManager {
   }
 
   /**
-   * Hides the editor and resets its state. 
+   * Hides the editor and resets its state.
    */
   hideEditor() {
     this.editor.style.display = "none";

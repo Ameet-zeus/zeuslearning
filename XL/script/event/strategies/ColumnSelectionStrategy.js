@@ -1,4 +1,10 @@
 export class ColumnSelectionStrategy {
+  /**
+   * Handles column selection and dragging in a spreadsheet-like interface.
+   * @param {*} inputManager to manage user input
+   * @param {*} renderer to render the grid
+   * @param {*} canvas canvas element for rendering
+   */
   constructor(inputManager, renderer, canvas) {
     this.inputManager = inputManager;
     this.renderer = renderer;
@@ -6,6 +12,10 @@ export class ColumnSelectionStrategy {
     this.dragging = null;
   }
 
+  /**
+   * Checks if the pointer event is a hit on a column header.
+   * @param {*} e Pointer event
+   */
   hitTest(e) {
     const rect = this.canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -14,6 +24,10 @@ export class ColumnSelectionStrategy {
     return result && result.type === 'column';
   }
 
+  /**
+   * Handles pointer down events to initiate column selection.
+   * @param {*} e Pointer event
+   */
   onPointerDown(e) {
     const rect = this.canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -32,6 +46,10 @@ export class ColumnSelectionStrategy {
     }
   }
 
+  /**
+   * Handles pointer move events to update column selection during dragging.
+   * @param {*} e Pointer event
+   */
   onPointerMove(e) {
     if (!this.dragging) return;
     const rect = this.canvas.getBoundingClientRect();
@@ -47,6 +65,10 @@ export class ColumnSelectionStrategy {
     }
   }
 
+  /**
+   * Handles pointer up events to finalize column selection.
+   * @param {*} e Pointer event
+   */
   onPointerUp(e) {
     this.dragging = null;
     this.renderer.drawGrid(this.inputManager.selectionManager.getSelection());

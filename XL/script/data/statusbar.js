@@ -88,7 +88,9 @@ export class StatusBar {
         }
       }
       this.cellRef.textContent = `Cell: ${this.getColumnLabel(startCol)}${startRow + 1}`;
-      this.rowColInfo.textContent = `Row: ${startRow + 1}, Col: ${this.getColumnLabel(startCol)}`;
+      const startLabel = `${this.getColumnLabel(startCol)}${startRow + 1}`;
+      const endLabel = `${this.getColumnLabel(endCol)}${endRow + 1}`;
+      this.rowColInfo.textContent = `Range: ${startLabel} - ${endLabel}`;
       this.selectionInfo.textContent = `${(endRow - startRow + 1) * (endCol - startCol + 1)} cells selected`;
       this.sumInfo.textContent = `Sum: ${sum}`;
       this.countInfo.textContent = `Count: ${count}`;

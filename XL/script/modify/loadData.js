@@ -18,7 +18,6 @@ export class LoadDataHandler {
    * @param {Array} jsonData - Array of objects (e.g., from info.json)
    */
   load(jsonData) {
-    // this.dataManager.data.clear();
     jsonData.forEach((rowObj, rowIdx) => {
       let colIdx = 0;
       for (const key in rowObj) {

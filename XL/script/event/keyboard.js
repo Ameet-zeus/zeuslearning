@@ -115,7 +115,6 @@ export class KeyboardEvents {
    */
   attach() {
     document.addEventListener("keydown", (e) => {
-      // Undo/Redo shortcuts
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "z") {
         e.preventDefault();
         if (window.CommandManagerInstance) window.CommandManagerInstance.undo();
@@ -326,7 +325,7 @@ export class KeyboardEvents {
               e.preventDefault();
               const editRow = sel.type === "range" ? anchorRow : row;
               const editCol = sel.type === "range" ? anchorCol : col;
-              this.inputManager.showEditor(editRow, editCol);
+              this.inputManager.positionEditor(editRow, editCol);
               const editor = this.inputManager.editor;
               if (editor) {
                 const val = editor.value;

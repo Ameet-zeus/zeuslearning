@@ -16,6 +16,8 @@ export class ScrollEvents {
    */
   attach() {
     const wrapper = document.getElementById('wrapper');
+    const canvas = document.getElementById('spreadsheet-canvas');
+
     wrapper.addEventListener('scroll', () => {
       this.viewport.scrollX = wrapper.scrollLeft;
       this.viewport.scrollY = wrapper.scrollTop;
@@ -53,5 +55,17 @@ export class ScrollEvents {
         }
       }
     });
+
+        canvas.addEventListener('wheel', (e) => {
+      const wrapper = document.getElementById('wrapper');
+      let deltaX = e.deltaX;
+      let deltaY = e.deltaY;
+      if (e.shiftKey && deltaX === 0 && deltaY !== 0) {
+        deltaX = deltaY;
+        deltaY = 0;
+      }
+      wrapper.scrollTop += deltaY;
+      wrapper.scrollLeft += deltaX;
+    }, { passive: false });
   }
 }

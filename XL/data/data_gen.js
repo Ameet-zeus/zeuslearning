@@ -23,7 +23,7 @@ function generateRandomData(numRecords) {
     return data;
 }
 
-const randomData = generateRandomData(100000);
+const randomData = generateRandomData(1000);
 
 fs.writeFile('./info.json', JSON.stringify(randomData, null, 2), (err) => {
     if (err) {

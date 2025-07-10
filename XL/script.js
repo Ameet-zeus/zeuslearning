@@ -40,8 +40,6 @@ function init() {
 
   window.updateStatusBar = (sel, data) => statusBar.update(sel, data);
   window.AddHandlerInstance = new AddHandler(selectionManager, data, renderer);
-
-  // Add CommandManager instance to window for global access
   window.CommandManagerInstance = new CommandManager();
   window.EditCellCommand = EditCellCommand;
   window.ResizeRowCommand = ResizeRowCommand;
@@ -51,10 +49,8 @@ function init() {
   window.undoXL = () => window.CommandManagerInstance.undo();
   window.redoXL = () => window.CommandManagerInstance.redo();
 
-  // Add LoadDataHandler instance to window for global access
   window.LoadDataHandlerInstance = new LoadDataHandler(data, renderer, rowManager, colManager);
 
-  // Set up JSON file input event
   const jsonInput = document.getElementById("json-file-input");
   if (jsonInput) {
     jsonInput.addEventListener("change", function (event) {

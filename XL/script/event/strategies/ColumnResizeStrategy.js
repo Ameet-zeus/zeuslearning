@@ -2,6 +2,13 @@
 import { ResizeColumnCommand } from "../../commands/commands.js";
 
 export class ColumnResizeStrategy {
+  /**
+   * Handles column resizing in a spreadsheet-like interface.
+   * @param {*} colManager to manage column widths
+   * @param {*} renderer to render the grid
+   * @param {*} canvas canvas element for rendering
+   * @param {*} resizer to handle resizing logic
+   */
   constructor(colManager, renderer, canvas, resizer) {
     this.colManager = colManager;
     this.renderer = renderer;
@@ -10,6 +17,10 @@ export class ColumnResizeStrategy {
     this.resizing = null;
   }
 
+  /**
+   * Checks if the pointer event is a hit on a column edge.
+   * @param {*} e Pointer event
+   */
   hitTest(e) {
     const rect = this.canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -18,6 +29,10 @@ export class ColumnResizeStrategy {
     return colEdge !== -1;
   }
 
+  /**
+   * Handles pointer down events to initiate column resizing.
+   * @param {*} e Pointer event for mouse down
+   */
   onPointerDown(e) {
     const rect = this.canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -34,6 +49,10 @@ export class ColumnResizeStrategy {
     }
   }
 
+  /**
+   * Handles pointer move events to resize the column.
+   * @param {*} e Pointer event for mouse move
+   */
   onPointerMove(e) {
     if (!this.resizing) return;
     const rect = this.canvas.getBoundingClientRect();
@@ -46,6 +65,10 @@ export class ColumnResizeStrategy {
     this.canvas.style.cursor = "ew-resize";
   }
 
+  /**
+   * Handles pointer up events to finalize column resizing.
+   * @param {*} e Pointer event for mouse up
+   */
   onPointerUp(e) {
     if (this.resizing && typeof window.CommandManagerInstance !== 'undefined') {
       const { index } = this.resizing;

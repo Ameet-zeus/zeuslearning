@@ -1,4 +1,10 @@
 export class RowSelectionStrategy {
+  /**
+   * Handles row selection in a spreadsheet-like interface.
+   * @param {*} inputManager to manage user input
+   * @param {*} renderer to render the grid
+   * @param {*} canvas canvas element for rendering
+   */
   constructor(inputManager, renderer, canvas) {
     this.inputManager = inputManager;
     this.renderer = renderer;
@@ -6,6 +12,10 @@ export class RowSelectionStrategy {
     this.dragging = null;
   }
 
+  /**
+   * Checks if the pointer event is a hit on a row header.
+   * @param {*} e Pointer event
+   */
   hitTest(e) {
     const rect = this.canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -14,6 +24,10 @@ export class RowSelectionStrategy {
     return result && result.type === 'row';
   }
 
+  /**
+   * Handles pointer down events to initiate row selection.
+   * @param {*} e Pointer event for mouse down
+   */
   onPointerDown(e) {
     const rect = this.canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -32,6 +46,10 @@ export class RowSelectionStrategy {
     }
   }
 
+  /**
+   * Handles pointer move events to update row selection during dragging.
+   * @param {*} e Pointer event for mouse move
+   */
   onPointerMove(e) {
     if (!this.dragging) return;
     const rect = this.canvas.getBoundingClientRect();
@@ -47,6 +65,10 @@ export class RowSelectionStrategy {
     }
   }
 
+  /**
+   * Handles pointer up events to finalize row selection.
+   * @param {*} e Pointer event for mouse up
+   */
   onPointerUp(e) {
     this.dragging = null;
     this.renderer.drawGrid(this.inputManager.selectionManager.getSelection());

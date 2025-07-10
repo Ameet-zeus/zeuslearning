@@ -9,6 +9,15 @@ import { ColumnResizeStrategy } from "./strategies/ColumnResizeStrategy.js";
 import { CursorStrategy } from "./strategies/CursorStrategy.js";
 
 export class PointerEvents {
+  /**
+   * Initializes the PointerEvents class to handle user interactions with the spreadsheet.
+   * @param {*} inputManager to manage user input
+   * @param {*} viewport to manage the viewport
+   * @param {*} renderer to render the grid
+   * @param {*} rowManager manages row operations
+   * @param {*} colManager manages column operations
+   * @param {*} canvas canvas element for rendering
+   */
   constructor(inputManager, viewport, renderer, rowManager, colManager, canvas) {
     this.inputManager = inputManager;
     this.viewport = viewport;
@@ -30,10 +39,12 @@ export class PointerEvents {
     this.attach();
   }
 
+  /**
+   * Attaches event listeners to the wrapper and canvas elements for pointer events.
+   */
   attach() {
     const wrapper = document.getElementById("wrapper");
     const canvas = this.canvas;
-
 
     wrapper.addEventListener("dblclick", (e) => {
       const rect = canvas.getBoundingClientRect();
@@ -46,28 +57,27 @@ export class PointerEvents {
     });
 
     canvas.addEventListener("pointerdown", (e) => {
-      // If a drag is already in progress, ignore new pointerdown
-      if (this.activeStrategy && this.activeStrategy.dragging) return;
+      if (this.activeStrategy?.dragging) return;
 
-      // Hide editor and commit value if open (like pointe.js)
-      if (this.inputManager.editor && this.inputManager.editor.style.display !== "none") {
+      if (this.inputManager.editor?.style.display !== "none") {
         const sel = this.inputManager.selectionManager.getSelection();
         const val = this.inputManager.editor.value;
-        if (sel && sel.type === 'cell') {
+        if (sel?.type === 'cell') {
           if (window.CommandManagerInstance && window.EditCellCommand) {
             window.CommandManagerInstance.executeCommand(new window.EditCellCommand(this.inputManager.data, sel.row, sel.col, val));
           } else {
             this.inputManager.data.set(sel.row, sel.col, val);
           }
-          if (window.updateStatusBar) window.updateStatusBar(sel, this.inputManager.data);
+          window.updateStatusBar?.(sel, this.inputManager.data);
         }
         this.inputManager.hideEditor();
       }
 
       for (const strategy of this.strategies) {
-        if (strategy.hitTest && strategy.hitTest(e)) {
+        if (strategy.hitTest?.(e)) {
           this.activeStrategy = strategy;
-          if (strategy.onPointerDown) strategy.onPointerDown(e);
+          strategy.onPointerDown?.(e);
+          strategy.setCursor();
           return;
         }
       }
@@ -78,7 +88,12 @@ export class PointerEvents {
       if (this.activeStrategy && this.activeStrategy.onPointerMove) {
         this.activeStrategy.onPointerMove(e);
       } else {
-        this.cursorStrategy.onPointerMove(e);
+        for (const strategy of this.strategies) {
+        if (strategy.hitTest?.(e)) {
+          strategy.setCursor();
+          return;
+        }
+      }
       }
     });
 
@@ -88,17 +103,5 @@ export class PointerEvents {
         this.activeStrategy = null;
       }
     });
-
-    canvas.addEventListener('wheel', (e) => {
-      const wrapper = document.getElementById('wrapper');
-      let deltaX = e.deltaX;
-      let deltaY = e.deltaY;
-      if (e.shiftKey && deltaX === 0 && deltaY !== 0) {
-        deltaX = deltaY;
-        deltaY = 0;
-      }
-      wrapper.scrollTop += deltaY;
-      wrapper.scrollLeft += deltaX;
-    }, { passive: false });
   }
 }
