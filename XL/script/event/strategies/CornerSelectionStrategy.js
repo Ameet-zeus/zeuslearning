@@ -20,6 +20,10 @@ export class CornerSelectionStrategy {
     return result && result.type === 'corner';
   }
 
+  setCursor() {
+    this.canvas.style.cursor = "cell";
+  }
+
   /**
    * Handles pointer down events to select all cells in the spreadsheet.
    * @param {*} e Pointer event for mouse down

@@ -46,8 +46,14 @@ function init() {
   window.ResizeColumnCommand = ResizeColumnCommand;
   window.AddRowCommand = AddRowCommand;
   window.AddColumnCommand = AddColumnCommand;
-  window.undoXL = () => window.CommandManagerInstance.undo();
-  window.redoXL = () => window.CommandManagerInstance.redo();
+  window.undoXL = () => {
+    window.CommandManagerInstance.undo();
+    window.renderer.drawGrid();
+  };
+  window.redoXL = () => {
+    window.CommandManagerInstance.redo();
+    window.renderer.drawGrid();
+  };
 
   window.LoadDataHandlerInstance = new LoadDataHandler(data, renderer, rowManager, colManager);
 
@@ -80,6 +86,8 @@ function init() {
   );
 
   renderer.drawGrid();
+
+  window.renderer = renderer; // Expose renderer globally for undo/redo rerender
 }
 
 init();

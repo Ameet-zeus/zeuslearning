@@ -24,6 +24,9 @@ export class ColumnSelectionStrategy {
     return result && result.type === 'column';
   }
 
+  setCursor() {
+    this.canvas.style.cursor = `url('/svg/arrow-down.svg') 8 8, pointer`;
+  }
   /**
    * Handles pointer down events to initiate column selection.
    * @param {*} e Pointer event

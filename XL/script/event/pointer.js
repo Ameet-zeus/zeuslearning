@@ -6,7 +6,6 @@ import { ColumnSelectionStrategy } from "./strategies/ColumnSelectionStrategy.js
 import { CornerSelectionStrategy } from "./strategies/CornerSelectionStrategy.js";
 import { RowResizeStrategy } from "./strategies/RowResizeStrategy.js";
 import { ColumnResizeStrategy } from "./strategies/ColumnResizeStrategy.js";
-import { CursorStrategy } from "./strategies/CursorStrategy.js";
 
 export class PointerEvents {
   /**
@@ -34,7 +33,6 @@ export class PointerEvents {
       new ColumnSelectionStrategy(inputManager, renderer, this.canvas),
       new CornerSelectionStrategy({ inputManager, canvas: this.canvas }),
     ];
-    this.cursorStrategy = new CursorStrategy(renderer, this.canvas, this.resizeHelper);
     this.activeStrategy = null;
     this.attach();
   }

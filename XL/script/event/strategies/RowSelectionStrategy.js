@@ -24,6 +24,10 @@ export class RowSelectionStrategy {
     return result && result.type === 'row';
   }
 
+  setCursor() {
+    this.canvas.style.cursor = `url('/svg/arrow-right.svg') 8 8, pointer`;
+  }
+
   /**
    * Handles pointer down events to initiate row selection.
    * @param {*} e Pointer event for mouse down

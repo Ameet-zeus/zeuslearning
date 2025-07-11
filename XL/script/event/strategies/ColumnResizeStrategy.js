@@ -29,6 +29,10 @@ export class ColumnResizeStrategy {
     return colEdge !== -1;
   }
 
+  setCursor() {
+    this.canvas.style.cursor = "ew-resize";
+  }
+
   /**
    * Handles pointer down events to initiate column resizing.
    * @param {*} e Pointer event for mouse down

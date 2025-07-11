@@ -24,6 +24,10 @@ export class CellSelectionStrategy {
     return result && result.type === 'cell';
   }
 
+  setCursor() {
+    this.canvas.style.cursor = "cell";
+  }
+
   /**
    * @param {*} e Pointer event for mouse down
    */
